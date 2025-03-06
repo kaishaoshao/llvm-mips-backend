@@ -1,11 +1,11 @@
 ---
-title: Welcome to Starlight
+title: Building an LLVM Backend for MIPS
 description: Get started building your docs site with Starlight.
 template: splash
 hero:
   tagline: Congrats on setting up a new Starlight project!
-  image:
-    file: ../../assets/houston.webp
+  # image:
+  #   file: ../../assets/houston.webp
   actions:
     - text: Example Guide
       link: /guides/example/
@@ -16,21 +16,90 @@ hero:
       variant: minimal
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+import { Card, CardGrid } from "@astrojs/starlight/components";
+import BlurCard from "../../components/BlurCard.astro";
 
-## Next steps
+<div className="page-gradient"></div>
+<div className="content-wrapper">
+<div className="hero-section">
+  # Writing an LLVM Backend for MIPS
+
+  <p>
+    A comprehensive guide to implementing a production-quality MIPS backend for
+    the LLVM compiler infrastructure
+  </p>
+</div>
 
 <CardGrid stagger>
-	<Card title="Update content" icon="pencil">
-		Edit `src/content/docs/index.mdx` to see this page change.
-	</Card>
-	<Card title="Add new content" icon="add-document">
-		Add Markdown or MDX files to `src/content/docs` to create new pages.
-	</Card>
-	<Card title="Configure your site" icon="setting">
-		Edit your `sidebar` and other config in `astro.config.mjs`.
-	</Card>
-	<Card title="Read the docs" icon="open-book">
-		Learn more in [the Starlight Docs](https://starlight.astro.build/).
-	</Card>
+  <BlurCard title="LLVM Basics" icon="seti:code-climate">
+    Learn the fundamental concepts of LLVM backends, including TableGen, target description files, and the overall architecture of LLVM's code generation infrastructure.
+  </BlurCard>
+
+{" "}
+
+<BlurCard title="MIPS Architecture" icon="seti:asm">
+  {/* ### 2. MIPS Architecture Deep Dive Explore the MIPS instruction set */}
+  MIPS architecture, register file organization, calling conventions, and special
+  hardware features that influence backend implementation.
+</BlurCard>
+
+<Card>
+  ### 3. Instruction Selection Master the process of translating LLVM IR to MIPS
+  assembly, including pattern matching, custom TableGen patterns, and
+  optimization opportunities specific to MIPS.
+</Card>
+
+{" "}
+
+<Card>
+  ### 4. Register Allocation Implement efficient register allocation strategies
+  for MIPS, handling register classes, spilling, and calling convention
+  requirements.
+</Card>
+
+{" "}
+
+<Card>
+  ### 5. Code Emission and ABI Learn how to emit proper MIPS assembly code,
+  manage relocations, and ensure compliance with the MIPS ABI specifications.
+</Card>
+
+{" "}
+
+<Card>
+  ### 6. Optimization Passes Develop MIPS-specific optimization passes to
+  improve code quality, including instruction scheduling, peephole
+  optimizations, and delay slot filling.
+</Card>
+
+{" "}
+
+<Card className="custom-card">
+  ### 7. Testing and Debugging Set up comprehensive testing infrastructure using
+  LLVM's integrated testing tools, and learn debugging techniques for backend
+  development.
+</Card>
+
+<div className="custom-card">
+  {/* <Card > */}
+    ### 8. Performance Tuning
+    Fine-tune the backend for optimal performance, including instruction selection patterns, scheduling policies, and target-specific optimizations.
+  {/* </Card> */}
+  </div>
+</CardGrid>
+</div>
+
+<CardGrid stagger>
+  <Card title="Update content" icon="pencil">
+    Edit `src/content/docs/index.mdx` to see this page change.
+  </Card>
+  <Card title="Add new content" icon="add-document">
+    Add Markdown or MDX files to `src/content/docs` to create new pages.
+  </Card>
+  <Card title="Configure your site" icon="setting">
+    Edit your `sidebar` and other config in `astro.config.mjs`.
+  </Card>
+  <Card title="Read the docs" icon="open-book">
+    Learn more in [the Starlight Docs](https://starlight.astro.build/).
+  </Card>
 </CardGrid>

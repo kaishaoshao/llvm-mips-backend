@@ -6,7 +6,8 @@ import starlight from '@astrojs/starlight';
 export default defineConfig({
 	integrations: [
 		starlight({
-			title: 'My Docs',
+			title: 'LLVM to MIPS',
+			customCss: ['./src/styles/custom.css'],
 			social: {
 				github: 'https://github.com/withastro/starlight',
 			},
@@ -22,6 +23,10 @@ export default defineConfig({
 					label: 'Reference',
 					autogenerate: { directory: 'reference' },
 				},
+				{
+					label: '2. MIPS Architecture',
+					autogenerate: { directory: 'mips-arch' },
+				}
 			],
 		}),
 	],
