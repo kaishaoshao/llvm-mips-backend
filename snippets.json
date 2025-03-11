@@ -1,0 +1,45 @@
+[
+  {
+    "id": "inner-snip1",
+    "filename": "/home/mirasma/Projects/llvm-mips-backend/example.txt",
+    "start_lineno": 10,
+    "end_lineno": 12,
+    "context_stack": [
+      {
+        "line": 5,
+        "type": "NAMESPACE"
+      },
+      {
+        "line": 6,
+        "type": "CLASS"
+      },
+      {
+        "line": 8,
+        "type": "FUNCTION"
+      }
+    ]
+  },
+  {
+    "id": "inner-snip2",
+    "filename": "/home/mirasma/Projects/llvm-mips-backend/example.txt",
+    "start_lineno": 16,
+    "end_lineno": 19,
+    "context_stack": [
+      {
+        "line": 5,
+        "type": "NAMESPACE"
+      },
+      {
+        "line": 6,
+        "type": "CLASS"
+      }
+    ]
+  },
+  {
+    "id": "outer-snip",
+    "filename": "/home/mirasma/Projects/llvm-mips-backend/example.txt",
+    "start_lineno": 1,
+    "end_lineno": 22,
+    "context_stack": []
+  }
+]

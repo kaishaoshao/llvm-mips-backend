@@ -9,15 +9,23 @@ export default defineConfig({
 			title: 'LLVM to MIPS',
 			customCss: ['./src/styles/custom.css'],
 			social: {
-				github: 'https://github.com/withastro/starlight',
+				github: 'https://github.com/optimisan/llvm-mips-backend',
 			},
 			sidebar: [
+				// {
+				// 	label: 'Guides',
+				// 	items: [
+				// 		// Each item here is one entry in the navigation menu.
+				// 		{ label: 'Example Guide', slug: 'guides/example' },
+				// 	],
+				// },
 				{
-					label: 'Guides',
-					items: [
-						// Each item here is one entry in the navigation menu.
-						{ label: 'Example Guide', slug: 'guides/example' },
-					],
+					label: 'Background',
+					autogenerate: { directory: 'background' },
+				},
+				{
+					label: "Section 1",
+					autogenerate: {directory: "section 1"}
 				},
 				{
 					label: 'Reference',

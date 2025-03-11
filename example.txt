@@ -1,0 +1,24 @@
+//@s outer-snip
+This is the outer snippet content.  
+
+class something {whoops} ;
+namespace llvm {
+    class ABC {
+
+    void otherFunction(int a,
+    int b) {
+        //@s  inner-snip1  
+        printf("the inner snip1");
+        //-  inner-snip1  
+    }
+    Continuing with the outer snippet content.  
+    
+        //@s inner-snip2  
+        This is the second inner snippet content.  
+        printf("the inner snip1");
+        //- inner-snip2  
+}
+Finishing the outer snippet content.  
+//-  outer-snip  
+}
+

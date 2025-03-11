@@ -1,0 +1,82 @@
+---
+title: The Target Triple
+description: ""
+---
+
+To generate code for `llc`, we should be able to invoke it as follows:
+
+```bash "-mtriple=mipsnova"
+llc -mtriple=mipsnova test.ll -o test.s
+```
+
+We will register our target as `mipsnova` in LLVM for this to work.
+
+import {Aside, Card} from "@astrojs/starlight/components";
+
+<Aside title="In the source">
+The `llvm::Triple` class is defined in `llvm/include/llvm/TargetParser/Triple.h`.
+
+This page basically restates and explains the doc comment for the `llvm::Triple` class.
+</Aside>
+
+## Triples
+The canonical name for a system type has the form `cpu-vendor-os`.
+This is the target triple.
+This comes from the `autoconf` tool, which can make decisions based on the
+system type.
+
+<details>
+<summary>Example: `i686-pc-linux-gnu`</summary>
+
+Breaking down,
+
+- `i686` is the CPU architecture, which is a 32-bit Intel x86.
+- `pc-linux` is the vendor, which is a generic PC.
+- `gnu` is the operating system, which is GNU/Linux.
+
+</details>
+
+<details>
+<summary> Find your system configuration name </summary>
+To find your system configuration name, run this command:
+
+```bash withOutput title="llvm-project"
+> bash llvm/cmake/config.guess
+
+x86_64-unknown-linux-gnu
+```
+
+To explore further, you can look into this
+snippet from the `config.guess` file:
+```bash withOutput title="from config.guess"
+> UNAME_MACHINE=`(uname -m) 2>/dev/null` || UNAME_MACHINE=unknown
+> UNAME_RELEASE=`(uname -r) 2>/dev/null` || UNAME_RELEASE=unknown
+> UNAME_SYSTEM=`(uname -s) 2>/dev/null`  || UNAME_SYSTEM=unknown
+> UNAME_VERSION=`(uname -v) 2>/dev/null` || UNAME_VERSION=unknown
+> echo "${UNAME_MACHINE}:${UNAME_SYSTEM}:${UNAME_RELEASE}:${UNAME_VERSION}"
+
+x86_64:Linux:5.15.153.1-microsoft-standard-WSL2:#1 SMP Fri Mar 29 23:14:13 UTC 2024
+```
+</details>
+
+## Registering our target triple
+The CPU architecture type for MipsNova will be `mipsnova`. Recall that this is
+a 32-bit architecture.
+
+Let's start by looking at the `llc` driver.
+
+```cpp frame="none"
+Triple triple;
+
+```
+```js title="something else"
+another here
+
+```
+
+import CodeSnippet from "../../../components/CodeSnippet.astro";
+
+
+<CodeSnippet id="outer-snip" />
+
+

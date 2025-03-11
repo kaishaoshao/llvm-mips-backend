@@ -1,0 +1,48 @@
+---
+title: About this book
+description: ""
+sidebar:
+    order: 1
+---
+This book will go over the process of converting LLVM IR to MIPS assembly code.
+
+Specifically, we will only be working on `llc`, the static LLVM IR to assembly compiler.
+
+import {LinkCard} from "@astrojs/starlight/components";
+
+<LinkCard title="Read more about llc" href="https://llvm.org/docs/CommandGuide/llc.html" />
+
+We will add a new target named MipsNova to the LLVM tree for the MIPS architecture. Like [Crafting Interpreters](https://craftinginterpreters.com), every line has an explanation in this book so you can follow along without needing to scour the internet for answers.
+
+## Reader's guide
+
+### Running commands in the book
+All bash commands are to be run from the root of the LLVM source tree,
+named as `llvm-project`.
+
+<LinkCard title="Getting started with LLVM"
+          description={`More information on how to setup
+            LLVM is in the later page.`}
+            href="/background/04-getting-started"
+/>
+
+```bash title="Example setup"
+git clone https://github.com/llvm/llvm-project
+cd llvm-project
+```
+
+### Command outputs
+For some commands I include the output that I 
+get from it, which is displayed like so:
+
+```bash withOutput title="Output below the command(s)"
+> echo "Hello World!"
+> echo "Output is after this code block"
+
+Hello World!
+Output is after this code block
+```
+
+## Errata
+If you find any errors or have any suggestions, please let me know by creating an issue on the book's GitHub repository. PRs are also most welcome!
+<LinkCard href="https://github.com/optimisan/llvm-mips-backend" title="View the GitHub Repository for this book" />

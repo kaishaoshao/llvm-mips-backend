@@ -157,3 +157,9 @@ root {
   max-width: 600px;
   margin: 0 auto;
 }
+
+:root[data-theme="light"] {
+  pre.output {
+    background-color: rgb(190, 199, 209) !important;
+  }
+}

@@ -1,0 +1,40 @@
+---
+title: The MipsNova Architecture
+description: Overview of the MIPS architecture we will follow.
+sidebar:
+    order: 2
+---
+
+The name of our new target is MipsNova.
+
+## Architecture Overview
+
+The ABI we will follow is the System V ABI for MIPS32.
+We will follow the description of the MIPS32 assembly language given in the [MIPS
+Assembly Language Programmer's Guide](https://www.cs.unibo.it/~solmi/teaching/arch_2002-2003/AssemblyLanguageProgDoc.pdf) book linked below.
+
+You can find the ABI details in the [MIPS32 ABI](https://math-atlas.sourceforge.net/devel/assembly/mipsabi32.pdf) document.
+
+> You don't need to read these documents right now. We will cover all the details as we build our backend.
+
+import {LinkCard, CardGrid} from "@astrojs/starlight/components";
+
+<CardGrid>
+<LinkCard href="https://www.cs.unibo.it/~solmi/teaching/arch_2002-2003/AssemblyLanguageProgDoc.pdf" title="MIPS
+Assembly Language
+Programmer's Guide"description="This contains the ASM info, MIPS Object File Format"/>
+
+<LinkCard title="MIPS32 ABI" href="https://math-atlas.sourceforge.net/devel/assembly/mipsabi32.pdf"/>
+</CardGrid>
+
+import {Aside} from "@astrojs/starlight/components";
+
+### Note
+
+Instead of dumping out all the ISA details here, we will start building the backend and look at the asm details as we go along. It is recommended that you know the basics of any assembly programming language before you start with this book.
+
+
+<Aside title="MIPS releases">
+There are multiple releases of the MIPS32 Architecture (from Release 1 till Release 6). We will mostly be generating code for Release 1.
+</Aside>
+

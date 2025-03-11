@@ -1,0 +1,17 @@
+---
+import fs from "node:fs/promises";
+import {Code as DefaultCode} from "@astrojs/starlight/components";
+
+const {id} = Astro.props;
+
+import { getEntry } from "astro:content";
+import {readSnippet} from '../util/read-snippet.ts';
+
+const snippet = await getEntry("snippets", id)
+
+const snippetText = await readSnippet(snippet!.data);
+console.log(snippetText)
+---
+
+<DefaultCode code={snippetText.snippet} lang="cpp"/>
+

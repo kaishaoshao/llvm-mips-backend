@@ -27,13 +27,37 @@ const { icon, title } = Astro.props;
     flex-direction: column;
     gap: clamp(0.5rem, calc(0.125rem + 1vw), 1rem);
     transition: transform 0.2s ease;
+    backdrop-filter: blur(8px);
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition:
+      transform 0.2s,
+      box-shadow 0.2s,
+      background-color 0.2s;
+    :root[data-theme="light"] & {
+      box-shadow: 0 4px 20px rgba(59, 130, 246, 0.15);
+    }
+    :root[data-theme="dark"] &:hover {
+      background: rgba(30, 41, 59, 0.8);
+      box-shadow: 0 4px 20px rgba(59, 130, 246, 0.2);
+    }
   }
+
+  :root[data-theme="light"] .card:hover {
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.15);
+  }
+  :root[data-theme="dark"] .card {
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
   :root[data-theme="light"] .card {
     /* background-color: var(--sl-color-white); */
     background-color: rgb(228, 242, 253);
   }
   .card:hover {
-    transform: scale(1.01) translateY(-0.25rem);
+    border-color: rgba(59, 130, 246, 0.4);
   }
   .card:nth-child(4n + 1) {
     --sl-card-border: var(--sl-color-orange);
