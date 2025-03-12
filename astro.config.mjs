@@ -5,6 +5,15 @@ import starlight from '@astrojs/starlight';
 // https://astro.build/config
 export default defineConfig({
 	integrations: [
+		{
+			name: "create-snippets-json",
+			hooks: {
+				'astro:config:setup': async (astroConfig) => {
+					console.log('Running create-snippets-json');
+					astroConfig.logger.info('Running create-snippets-json');
+				}
+			}
+		},
 		starlight({
 			title: 'LLVM to MIPS',
 			customCss: ['./src/styles/custom.css'],

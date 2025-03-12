@@ -5,5 +5,12 @@ import { pluginCodeCaption } from './src/scripts/code-caption.ts';
 /** @type {import('@astrojs/starlight/expressive-code').StarlightExpressiveCodeOptions} */
 export default {
     plugins: [pluginCodeOutput(), pluginCodeCaption(), pluginCollapsibleSections()],
-    themes: ['catppuccin-mocha', 'catppuccin-latte']
+    themes: ['dark-plus', 'light-plus'],
+    styleOverrides: {
+        textMarkers: {
+            backgroundOpacity: '20%',
+            defaultChroma: '30',
+            markBackground: '#22262d'
+        }
+    }
 }

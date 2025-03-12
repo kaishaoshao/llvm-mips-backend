@@ -37,17 +37,21 @@ export async function readSnippet(snippet: z.infer<typeof snippetType>) {
         if (start <= SURROUNDING_CONTEXT_LINES && start > 0) {
             // this corresponds to the lines above the 
             // snippet start line
-            surrounding.before = text[i] + surrounding.before;
+            surrounding.before += text[i];
         }
         if (start < 0) {
             // we are in the snippet
             if (text[i] === "\n") {
                 end--;
             }
-            if (end === 0) {
-                break; //done
+            if (end > 0) {
+                // we are in the snippet
+                snippetText += text[i];
+            } else if (end >= -SURROUNDING_CONTEXT_LINES && end < 0) {
+                // this corresponds to the lines after the 
+                // snippet end line
+                surrounding.after += text[i];
             }
-            snippetText += text[i];
         }
         else if (text[i] === "\n") {
             start--;
@@ -58,6 +62,11 @@ export async function readSnippet(snippet: z.infer<typeof snippetType>) {
     return {
         snippet: snippetText + "\n",
         context: contextText,
-        // highlightLines
+        filename: snippet.filename,
+        surrounding: {
+            lines: SURROUNDING_CONTEXT_LINES,
+            before: surrounding.before,
+            after: surrounding.after
+        }
     };
 }

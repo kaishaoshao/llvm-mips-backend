@@ -1,17 +1,60 @@
 ---
 import fs from "node:fs/promises";
-import {Code as DefaultCode} from "@astrojs/starlight/components";
+import { Code as DefaultCode } from "@astrojs/starlight/components";
 
-const {id} = Astro.props;
+const { id } = Astro.props;
 
 import { getEntry } from "astro:content";
-import {readSnippet} from '../util/read-snippet.ts';
+import { readSnippet } from "../util/read-snippet.ts";
 
-const snippet = await getEntry("snippets", id)
+const snippet = await getEntry("snippets", id);
 
-const snippetText = await readSnippet(snippet!.data);
-console.log(snippetText)
+const snippetData = await readSnippet(snippet!.data);
+console.log(snippetData);
+
+const before = snippetData.surrounding.before;
+const after = snippetData.surrounding.after;
+let contextLine = snippetData.context;
+const contextLength = contextLine.at(-1) == "\n" ? 1 : 0;
+
+if (contextLength > 0) {
+    contextLine = ">> " + contextLine.trim() + "\n";
+} else {
+    contextLine = ">> new file";
+}
+
+const code = `${before}${snippetData.snippet}${after}`;
+const len = code.split("\n").length;
+const markRange = `${before.split("\n").length}-${len - 1 - snippetData.surrounding.lines}`;
+
+const filename = snippetData.filename.replace("/home/mirasma", "");
+const lang = filename!.split(".").pop();
 ---
 
-<DefaultCode code={snippetText.snippet} lang="cpp"/>
-
+<style>
+    .code-snippet {
+        display: flex;
+        flex-direction: column;
+        gap: 0rem;
+        * {
+            margin: 0 !important;
+        }
+        .context {
+            background-color: var(--sl-color-gray-6);
+            padding: calc(var(--ec-uiPadBlk) + var(--ec-frm-edActTabIndHt))
+                var(--ec-uiPadInl);
+            font-family: var(--ec-codeFontFml);
+            font-style: italic;
+            font-size: calc(0.97 * var(--ec-codeFontSize));
+        }
+    }
+</style>
+<div class="code-snippet">
+    <div class="context">{contextLine}</div>
+    <DefaultCode
+        code={code}
+        title={filename}
+        lang={"cpp"}
+        mark={{ range: markRange }}
+    />
+</div>
