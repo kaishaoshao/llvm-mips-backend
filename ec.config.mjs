@@ -6,6 +6,12 @@ import { pluginCodeCaption } from './src/scripts/code-caption.ts';
 export default {
     plugins: [pluginCodeOutput(), pluginCodeCaption(), pluginCollapsibleSections()],
     themes: ['dark-plus', 'light-plus'],
+    defaultProps: {
+        wrap: true,
+        overridesByLang: {
+            'bash,sh': { preserveIndent: true}
+        }
+    },
     styleOverrides: {
         textMarkers: {
             backgroundOpacity: '20%',

@@ -1,45 +1,282 @@
 [
   {
+    "id": "nova-all-targets-cmake",
+    "filename": "/home/mirasma/Projects/llvm-project/llvm/CMakeLists.txt",
+    "start_lineno": 497,
+    "end_lineno": 499,
+    "context_stack": [
+      {
+        "type": "NONE",
+        "line": 0
+      }
+    ],
+    "type": "add"
+  },
+  {
+    "id": "something",
+    "filename": "/home/mirasma/Projects/llvm-project/llvm/include/llvm/TargetParser/Triple.h",
+    "start_lineno": 19,
+    "end_lineno": 21,
+    "context_stack": [
+      {
+        "type": "NONE",
+        "line": 0
+      }
+    ],
+    "type": "add"
+  },
+  {
+    "id": "triple1",
+    "filename": "/home/mirasma/Projects/llvm-project/llvm/include/llvm/TargetParser/Triple.h",
+    "start_lineno": 71,
+    "end_lineno": 73,
+    "context_stack": [
+      {
+        "type": "NAMESPACE",
+        "line": 23
+      },
+      {
+        "type": "CLASS",
+        "line": 46
+      },
+      {
+        "type": "ENUM",
+        "line": 48
+      }
+    ],
+    "type": "add"
+  },
+  {
+    "id": "sub-arch",
+    "filename": "/home/mirasma/Projects/llvm-project/llvm/include/llvm/TargetParser/Triple.h",
+    "start_lineno": 115,
+    "end_lineno": 123,
+    "context_stack": [
+      {
+        "type": "NAMESPACE",
+        "line": 23
+      },
+      {
+        "type": "CLASS",
+        "line": 46
+      }
+    ],
+    "type": "mark"
+  },
+  {
+    "id": "snippet-after",
+    "filename": "/home/mirasma/Projects/llvm-project/llvm/include/llvm/TargetParser/Triple.h",
+    "start_lineno": 1286,
+    "end_lineno": 1288,
+    "context_stack": [
+      {
+        "type": "AFTER",
+        "line": 23
+      }
+    ],
+    "type": "removed"
+  },
+  {
     "id": "inner-snip1",
-    "filename": "/home/mirasma/Projects/llvm-mips-backend/example.txt",
-    "start_lineno": 10,
-    "end_lineno": 12,
+    "filename": "/home/mirasma/Projects/llvm-project/llvm/lib/Target/AMDGPU/AMDGPUTargetMachine.cpp",
+    "start_lineno": 156,
+    "end_lineno": 161,
     "context_stack": [
       {
-        "line": 5,
-        "type": "NAMESPACE"
+        "type": "NAMESPACE",
+        "line": 118
       },
       {
-        "line": 6,
-        "type": "CLASS"
-      },
-      {
-        "line": 8,
-        "type": "FUNCTION"
+        "type": "FUNCTION",
+        "line": 151
       }
-    ]
+    ],
+    "type": "add"
   },
   {
-    "id": "inner-snip2",
-    "filename": "/home/mirasma/Projects/llvm-mips-backend/example.txt",
-    "start_lineno": 16,
-    "end_lineno": 19,
+    "id": "init",
+    "filename": "/home/mirasma/Projects/llvm-project/llvm/lib/Target/AMDGPU/AMDGPUTargetMachine.cpp",
+    "start_lineno": 171,
+    "end_lineno": 173,
     "context_stack": [
       {
-        "line": 5,
-        "type": "NAMESPACE"
-      },
-      {
-        "line": 6,
-        "type": "CLASS"
+        "type": "NAMESPACE",
+        "line": 118
       }
-    ]
+    ],
+    "type": "add"
   },
   {
-    "id": "outer-snip",
-    "filename": "/home/mirasma/Projects/llvm-mips-backend/example.txt",
+    "id": "nova-cmake1",
+    "filename": "/home/mirasma/Projects/llvm-project/llvm/lib/Target/Nova/CMakeLists.txt",
     "start_lineno": 1,
-    "end_lineno": 22,
-    "context_stack": []
+    "end_lineno": 16,
+    "context_stack": [
+      {
+        "type": "NONE",
+        "line": 0
+      }
+    ],
+    "type": "add"
+  },
+  {
+    "id": "nova-tm-cpp",
+    "filename": "/home/mirasma/Projects/llvm-project/llvm/lib/Target/Nova/MipsNovaTargetMachine.cpp",
+    "start_lineno": 1,
+    "end_lineno": 24,
+    "context_stack": [
+      {
+        "type": "NONE",
+        "line": 0
+      }
+    ],
+    "type": "add"
+  },
+  {
+    "id": "new-file",
+    "filename": "/home/mirasma/Projects/llvm-project/llvm/lib/TargetParser/Triple.cpp",
+    "start_lineno": 1,
+    "end_lineno": 10,
+    "context_stack": [
+      {
+        "type": "NONE",
+        "line": 0
+      }
+    ],
+    "type": "add"
+  },
+  {
+    "id": "other",
+    "filename": "/home/mirasma/Projects/llvm-project/llvm/lib/TargetParser/Triple.cpp",
+    "start_lineno": 50,
+    "end_lineno": 52,
+    "context_stack": [
+      {
+        "type": "FUNCTION",
+        "line": 26
+      }
+    ],
+    "type": "add"
+  },
+  {
+    "id": "another",
+    "filename": "/home/mirasma/Projects/llvm-project/llvm/lib/TargetParser/Triple.cpp",
+    "start_lineno": 57,
+    "end_lineno": 59,
+    "context_stack": [
+      {
+        "type": "FUNCTION",
+        "line": 26
+      }
+    ],
+    "type": "add"
+  },
+  {
+    "id": "get-arch-type-name",
+    "filename": "/home/mirasma/Projects/llvm-project/llvm/lib/TargetParser/Triple.cpp",
+    "start_lineno": 60,
+    "end_lineno": 62,
+    "context_stack": [
+      {
+        "type": "FUNCTION",
+        "line": 26
+      }
+    ],
+    "type": "add"
+  },
+  {
+    "id": "case-triple",
+    "filename": "/home/mirasma/Projects/llvm-project/llvm/lib/TargetParser/Triple.cpp",
+    "start_lineno": 449,
+    "end_lineno": 451,
+    "context_stack": [
+      {
+        "type": "FUNCTION",
+        "line": 431
+      }
+    ],
+    "type": "add"
+  },
+  {
+    "id": "parse-arch-nova",
+    "filename": "/home/mirasma/Projects/llvm-project/llvm/lib/TargetParser/Triple.cpp",
+    "start_lineno": 601,
+    "end_lineno": 603,
+    "context_stack": [
+      {
+        "type": "FUNCTION",
+        "line": 569
+      }
+    ],
+    "type": "add"
+  },
+  {
+    "id": "default-format-nova",
+    "filename": "/home/mirasma/Projects/llvm-project/llvm/lib/TargetParser/Triple.cpp",
+    "start_lineno": 969,
+    "end_lineno": 971,
+    "context_stack": [
+      {
+        "type": "FUNCTION",
+        "line": 932
+      }
+    ],
+    "type": "add"
+  },
+  {
+    "id": "triple2",
+    "filename": "/home/mirasma/Projects/llvm-project/llvm/lib/TargetParser/Triple.cpp",
+    "start_lineno": 1040,
+    "end_lineno": 1053,
+    "context_stack": [
+      {
+        "type": "FUNCTION",
+        "line": 1033
+      },
+      {
+        "type": "FUNCTION",
+        "line": 1034
+      }
+    ],
+    "type": "add"
+  },
+  {
+    "id": "32-bit-nova-ptr",
+    "filename": "/home/mirasma/Projects/llvm-project/llvm/lib/TargetParser/Triple.cpp",
+    "start_lineno": 1685,
+    "end_lineno": 1687,
+    "context_stack": [
+      {
+        "type": "FUNCTION",
+        "line": 1661
+      }
+    ],
+    "type": "add"
+  },
+  {
+    "id": "32bit-variant",
+    "filename": "/home/mirasma/Projects/llvm-project/llvm/lib/TargetParser/Triple.cpp",
+    "start_lineno": 1798,
+    "end_lineno": 1800,
+    "context_stack": [
+      {
+        "type": "FUNCTION",
+        "line": 1769
+      }
+    ],
+    "type": "add"
+  },
+  {
+    "id": "64bit-variant",
+    "filename": "/home/mirasma/Projects/llvm-project/llvm/lib/TargetParser/Triple.cpp",
+    "start_lineno": 1863,
+    "end_lineno": 1865,
+    "context_stack": [
+      {
+        "type": "FUNCTION",
+        "line": 1851
+      }
+    ],
+    "type": "add"
   }
 ]

@@ -7,6 +7,11 @@ bool someFunction(int a, int b) {
 // CHECK-NEXT: bool someFunction
         }
     }
+    if (a) {
+        return false;
+    } else if(b == 6) {
+        return true;
+    }
 }
 
 static VersionTuple getCanonicalVersionForOS(OSType OSKind,

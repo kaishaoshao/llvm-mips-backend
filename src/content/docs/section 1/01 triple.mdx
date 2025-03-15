@@ -3,6 +3,9 @@ title: The Target Triple
 description: ""
 ---
 
+import CodeSnippet from "../../../components/CodeSnippet.astro";
+import Details from "../../../components/Collapsible.astro";
+
 To generate code for `llc`, we should be able to invoke it as follows:
 
 ```bash "-mtriple=mipsnova"
@@ -11,12 +14,26 @@ llc -mtriple=mipsnova test.ll -o test.s
 
 We will register our target as `mipsnova` in LLVM for this to work.
 
+## Architectures and SubArchitectures
+
+Sub-architectures of an architecture are used to represent different versions of
+the same architecture. For example, `mips` has the sub architecture `mipsr6` which
+corresponds to the MIPS Release 6 architecture. Release 6 differs from previous releases
+wherein it adds new and removes few instructions.
+
+<details>
+<summary>See the list of SubArchitectures</summary>
+<CodeSnippet id="sub-arch"/>
+</details>
+
+
 import {Aside, Card} from "@astrojs/starlight/components";
 
 <Aside title="In the source">
 The `llvm::Triple` class is defined in `llvm/include/llvm/TargetParser/Triple.h`.
 
 This page basically restates and explains the doc comment for the `llvm::Triple` class.
+But read on, because we will add our target in this chapter.
 </Aside>
 
 ## Triples
@@ -59,26 +76,150 @@ x86_64:Linux:5.15.153.1-microsoft-standard-WSL2:#1 SMP Fri Mar 29 23:14:13 UTC 2
 ```
 </details>
 
+The `Triple` class parses the architecture, sub-architecture, vendor, os and environment
+fields from the string passed in the command line (or in the LLVM module).
+
 ## Registering our target triple
 The CPU architecture type for MipsNova will be `mipsnova`. Recall that this is
 a 32-bit architecture.
 
+### Triple in `llc`
 Let's start by looking at the `llc` driver.
 
-```cpp frame="none"
-Triple triple;
+```cpp title="llvm/tools/llc/llc.cpp" {6-9} mark="Triple::normalize"
+static cl::opt<std::string>
+TargetTriple("mtriple", cl::desc("Override target triple for module"));
+...
 
+static int compileModule(...) {
+    if (!TargetTriple.empty())
+        IRTargetTriple = Triple::normalize(TargetTriple);
+      TheTriple = Triple(IRTargetTriple);
+}
 ```
-```js title="something else"
-another here
 
+We see that the `normalize` method is called on the Triple object.
+This rearranges the triple to its canonical form (`cpu-vendor-os`) by parsing a `-`
+separated string that may have the fields in a different order.
+
+
+To add our arch name `mipsnova` to the list of known architectures, we need to
+modify a few methods in `Triple`.
+
+<details>
+<summary>More info: Parsing the triple string</summary>
+The constructor for `Triple` takes a string and parses it with these functions.
+Right now we are interested in the `parseArch` method.
+<CodeSnippet id="triple2" mark="parseArch" noContext noIns/>
+</details>
+
+{/* Let's test this function in a standalone tool. Create a new directory at */}
+{/* `llvm/tools/ex` and add the following code: */}
+
+{/* <CodeSnippet id="ex-cmake"/> */}
+
+For that, we add `mipsnova` to the `ArchType` enum.
+
+<CodeSnippet id="triple1" />
+
+Next, we have to add the enum to string conversion for parsing and printing.
+
+<CodeSnippet id="get-arch-type-name"/>
+<CodeSnippet id="case-triple"/>
+<CodeSnippet id="parse-arch-nova"/>
+
+{/* We also have to add the default object file format our architecture uses.
+
+<details>
+<summary>Object file formats</summary>
+There is a nice  */}
+
+Since `mipsnova` is a 32-bit architecture, we mention that in `getArchPointerBitWidth`.
+
+<CodeSnippet id="32-bit-nova-ptr"/>
+
+`mipsnova` is already 32 bit, so add it after `mipsel` in `get32BitArchVariant`.
+
+<CodeSnippet id="32bit-variant"/>
+
+<CodeSnippet id="64bit-variant"/>
+
+<Details title="Why is this required?">
+I am not sure myself. It seems like this is used for the LLVM JIT engine but if you 
+know more, please let me know (the GitHub repo url is at the top-right of this page!).
+</Details>
+
+
+### Setting up the target in CMake
+
+The target files live in the `llvm/lib/Target/` directory.
+We add our directory `Nova` here and add our target
+the list of all targets in `llvm/CMakeLists.txt`.
+<CodeSnippet id="nova-all-targets-cmake"/>
+
+Create the `CMakeLists.txt` file in our `Nova` directory.
+<CodeSnippet id="nova-cmake1"/>
+
+<Details title="Todo (for the author)" type="warning">
+`LINK_COMPONENTS` does not appear to be required. Removing that section still compiles
+`llc` with our target. Figure out why that is so.
+</Details>
+
+Finish by adding our source file `MipsNovaTargetMachine.cpp` to the same directory.
+We will get back to this later to fill in the required methods. Right now, this will
+enable us to compile `llc` with `mipsnova`.
+<CodeSnippet id="nova-tm-cpp"/>
+
+## Build LLVM with our target 
+Now, build LLVM with the `Nova` target.
+
+```bash Build LLVM
+cd llvm-project
+
+cmake -S llvm -B build -G Ninja \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DLLVM_BUILD_TESTS=ON \
+      -DLLVM_PARALLEL_LINK_JOBS=8 \
+      -DLLVM_TARGETS_TO_BUILD='X86;Nova'
+
+cmake --build build --target llc
 ```
 
-import CodeSnippet from "../../../components/CodeSnippet.astro";
+Now we can run `llc` with the `mipsnova` target.
 
+```bash "-mtriple=mipsnova" withOutput
+> build/bin/llc -mtriple=mipsnova < /dev/null
 
-<CodeSnippet id="outer-snip" />
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace.
+Stack dump:
+0.      Program arguments: build/bin/llc -mtriple=mipsnova
+ #0 0x000056117674c440 llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (build/bin/llc+0x1dce440)
+...
+```
+<Details title="What happened?">
+The target machine for `mipsnova` is not implemented yet. We will get to that in the next section.
 
+Before registering the target, we would get this error:
+```log wrap
+llc: error: unable to get target for 'mipsnova', see --version and --triple.
+```
+</Details>
+This won't work yet because we haven't implemented the target machine for `mipsnova`,
+but `llc` now accepts our target triple!
 
-<CodeSnippet id="inner-snip2" />
+{/* Our target's name is `NovaMips` instead of `MipsNova` because of a weird error I suspect because of the common prefix with the existing `Mips` target.
+<details>
+<summary>What is the error?</summary>
+```
+-- Clang version: 21.0.0git
+CMake Error at cmake/modules/LLVM-Config.cmake:271 (message):
+  Library 'Mips' is a direct reference to a target library for an omitted
+  target.
+Call Stack (most recent call first):
+  cmake/modules/AddLLVM.cmake:779 (llvm_map_components_to_libnames)
+  cmake/modules/AddLLVM.cmake:944 (llvm_add_library)
+  tools/llvm-exegesis/lib/Mips/CMakeLists.txt:16 (add_llvm_library)
+```
+</details> */}
 
+{/* <CodeSnippet id='start-target-cmake'/> */}

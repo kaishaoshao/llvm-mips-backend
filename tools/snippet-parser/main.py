@@ -1,6 +1,15 @@
 # the snippets format is
-# //@s snippet-name
+# //@s snippet-name <type>
 # //- snippet-name
+# <type> = "mark" | "removed" | <replace>
+# <replace> = "replace" "=" <snippet-id-this-replaces>
+# If type is "removed", leading comments in the snippet
+# will be removed while rendering in CodeSnippet.astro
+
+# If type is "replace", the <snippet-id-this-replaces> will be shown
+# as a deleted diff in the CodeSnippet.astro, with the current snippet
+# as the added diff.
+
 # Snippets should not be nested.
 # This script extracts all snippets and writes them to
 # snippets.json file.
@@ -54,15 +63,26 @@ def get_abs_filenames(llvm_dir: Path):
 
 
 class Regexes:
-    endings = ['{', '(', ',']
+    cpp_prefix = r'^\s*\/\/'
+    td_prefix = r'^\s*#'
+    start_suffix = r'@s\s+(?P<name>[^ \s]+)(?P<type>\s+[^\s=]+(=[^=\s]+)?)?\s*$'
+    end_suffix = r'-\s+([^ ]+)\s*$'
+
+    endings = ['{', '(', ',', ')'] # is for Triple::Triple(something) constructor syntax
     keywords = ['if', 'while', 'switch']
+    
     multiline_end = re.compile(r'^\s*[^)\n]+\)[^\n]*[;]$')
-    start_regex = re.compile(r'^\s*\/\/\@s\s+([^ \s]+)\s*$')
+
+    start_regex = re.compile(cpp_prefix + start_suffix)
+    end_regex = re.compile(cpp_prefix + end_suffix)
+
+    td_start_regex = re.compile(td_prefix + start_suffix)
+    td_end_regex = re.compile(td_prefix + end_suffix)
+
     function_pattern = re.compile(
         r'((?:template\s*<.*>\s*)?(?:\w+(?:::\w+)*\s+)+\w+\s*\([^)]*\)(?:\s*const)?(?:\s*noexcept)?(?:\s*override)?(?:\s*final)?(?:\s*=\s*default)?(?:\s*=\s*delete)?)\s*{')
     multiline_function = re.compile(
         r'((?:template\s*<.*>\s*)?(?:\w+(?:::\w+)*\s+)+\w+\s*\([^),]*,)')
-    end_regex = re.compile(r'\s*\/\/\-\s+([^ ]+)\s*$')
     extern_c = re.compile(r'^\s*extern "C" .+\(')
     new_function_pattern = re.compile(
         r'''^(?:\stemplate\s<[^>]+>\s*)? # optional template clause
@@ -121,8 +141,12 @@ class Context:
 
 
 class Snippet:
-    def __init__(self, name, filename, start_lineno, end_lineno=None, context_stack=[]):
+    def __init__(self, name, type: str, filename, start_lineno, end_lineno=None, context_stack=[]):
         self.name = name
+        self.type = type
+        if self.type is None:
+            self.type = "add"
+        self.type = self.type.strip()
         self.filename = filename
         self.start_lineno = start_lineno
         self.end_lineno = end_lineno
@@ -144,7 +168,8 @@ class Snippet:
             "filename": self.filename,
             "start_lineno": self.start_lineno,
             "end_lineno": self.end_lineno,
-            "context_stack": [c.to_dict() for c in self.context_stack]
+            "context_stack": [c.to_dict() for c in self.context_stack],
+            "type": self.type
         }
 
 
@@ -185,6 +210,16 @@ class FileSnippetReader:
             # print('where')
             return Context("", Context.Type.NONE, 0)
         return self.last_context.copyWith(Context.Type.AFTER)
+    
+    def get_regex(self, start: bool):
+        if self.filepath.suffix == ".cpp" or self.filepath.suffix == ".h":
+            return Regexes.start_regex if start else Regexes.end_regex
+        elif self.filepath.suffix == ".td" or self.filepath.suffix == ".txt":
+            return Regexes.td_start_regex if start else Regexes.td_end_regex
+        else:
+            # throw error
+            Colors.error(f"Error: Unknown file extension {self.filepath.suffix}")
+            sys.exit(1)
 
     def extract_file_snippets(self, filepath: Path):
         """
@@ -205,23 +240,24 @@ class FileSnippetReader:
                 self.print_context()
                 # continue
                 # end header
-                start_match = Regexes.start_regex.match(line)
-                end_match = Regexes.end_regex.match(line)
+                start_match = self.get_regex(start=True).match(line)
+                end_match = self.get_regex(start=False).match(line)
                 if start_match:
                     # print("found match with context as ", len(self.context_stack))
                     the_context = self.context_stack.copy()
                     if the_context.__len__() == 0:
                         the_context.append(self.get_last_after_context())
-                    stack.append(Snippet(name=start_match.group(1),
+                    stack.append(Snippet(name=start_match.group("name"),
+                                         type=start_match.group("type"),
                                          filename=filepath.absolute().as_posix(),
                                          start_lineno=lineno,
                                          end_lineno=None,
                                          context_stack=the_context))
                 elif end_match:
                     if not stack:
-                        print(f"Error: line {lineno}: Found end without start")
+                        print(f"Error: line {lineno}: Found end snippet without start")
                         print(f"Snippet name: {end_match.group(1)}")
-                        print(f"Snippet file: {filename}")
+                        print(f"Snippet file: {self.filepath}")
                         sys.exit(1)
                     end_line = lineno
                     snippets.append(stack.pop().withEndLine(end_line))
@@ -248,6 +284,9 @@ class FileSnippetReader:
         return line.strip().startswith("}")
 
     def consume_context(self):
+        if self.filepath.suffix != ".cpp" and self.filepath.suffix != ".h":
+            return
+
         # attempt to read the context
         # context can be a function or enum or class
         # line = self.lines[self.i]

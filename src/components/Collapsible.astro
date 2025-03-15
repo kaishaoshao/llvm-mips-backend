@@ -1,0 +1,204 @@
+---
+interface Props {
+  title: string;
+  type?: 'note' | 'tip' | 'warning' | 'danger';
+}
+
+const { title, type = 'note' } = Astro.props;
+
+const icons = {
+  note: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M8 8.5v-4"/><path d="M8 11.5v-.5"/></svg>`,
+  tip: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1.5v1M12 4l.7-.7M4 4l-.7-.7M2.5 8h-1M14.5 8h-1M12 12l.7.7M4 12l-.7.7M8 14.5v1M10 8a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z"/></svg>`,
+  warning: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1 1 14h14L8 1ZM8 6v3M8 11.5v.5"/></svg>`,
+  danger: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="m10 6-4 4M6 6l4 4"/></svg>`
+};
+
+const colors = {
+  note: 'details--note',
+  tip: 'details--tip',
+  warning: 'details--warning',
+  danger: 'details--danger'
+};
+---
+
+<details class={`details ${colors[type]}`}>
+  <summary class="details-summary">
+    <span class="icon" set:html={icons[type]} />
+    <span class="title">{title}</span>
+    <!-- <span class="arrow">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m4 6 4 4 4-4"/>
+      </svg>
+    </span> -->
+  </summary>
+  <div class="content">
+    <slot />
+  </div>
+</details>
+
+<script>
+//   // Add animation support for details elements
+//   document.addEventListener('DOMContentLoaded', () => {
+//     const details = document.querySelectorAll('.details');
+    
+//     details.forEach(detail => {
+//       const content = detail.querySelector('.content') as HTMLElement;
+      
+//       // Store the content height for animations
+//       const storeHeight = () => {
+//         content.style.height = '';
+//         content.style.height = content.scrollHeight + 'px';
+//       };
+      
+//       // Initial height storage
+//       if (detail.hasAttribute('open')) {
+//         storeHeight();
+//       }
+      
+//       detail.addEventListener('click', (e) => {
+//         // Prevent default toggle behavior
+//         e.preventDefault();
+        
+//         if (!detail.hasAttribute('open')) {
+//           // Opening
+//           detail.setAttribute('open', '');
+//           content.style.height = '0';
+//           requestAnimationFrame(() => {
+//             content.style.height = content.scrollHeight + 'px';
+//           });
+//         } else {
+//           // Closing
+//           content.style.height = content.scrollHeight + 'px';
+//           requestAnimationFrame(() => {
+//             content.style.height = '0';
+//           });
+//         }
+//       });
+      
+//       // Handle transition end
+//       content.addEventListener('transitionend', () => {
+//         if (!detail.hasAttribute('open')) {
+//           return;
+//         }
+//         if (content.style.height === '0px') {
+//           detail.removeAttribute('open');
+//         } else {
+//           content.style.height = 'auto';
+//         }
+//       });
+      
+//       // Update height on window resize
+//       window.addEventListener('resize', () => {
+//         if (detail.hasAttribute('open')) {
+//           if (content.style.height !== 'auto') {
+//             content.style.height = content.scrollHeight + 'px';
+//           }
+//         }
+//       });
+//     });
+//   });
+</script>
+
+<style>
+  details.details {
+    border: 1px solid;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    transition: background-color 0.2s ease;
+  }
+
+ 
+  .details--note {
+    background-color: #1e293b;
+    border-color: #334155 !important;
+    color: #93c5fd;
+  }
+
+  .details--tip {
+    background-color: #14432a;
+    border-color: #166534 !important;
+    color: #86efac;
+  }
+
+  .details--warning {
+    background-color: #422006;
+    border-color: #854d0e !important;
+    color: #fde047;
+  }
+
+  .details--danger {
+    background-color: #450a0a;
+    border-color: #991b1b !important;
+    color: #fca5a5;
+  }
+
+  /* Light mode */
+  :root[data-theme='light'] .details--note {
+    background-color: #f0f7ff;
+    border-color: #bfdbfe;
+    color: #1e40af;
+  }
+
+  :root[data-theme='light'] .details--tip {
+    background-color: #f0fdf4;
+    border-color: #bbf7d0;
+    color: #166534;
+  }
+
+  :root[data-theme='light'] .details--warning {
+    background-color: #fefce8;
+    border-color: #fef08a;
+    color: #854d0e;
+  }
+
+  :root[data-theme='light'] .details--danger {
+    background-color: #fef2f2;
+    border-color: #fecaca;
+    color: #991b1b;
+  }
+
+  summary.details-summary {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0 !important;
+    padding: 0.6rem 0.75rem;
+    padding-left: 0;
+    cursor: pointer;
+  }
+
+  .title {
+    font-weight: 500;
+  }
+
+  .arrow {
+    margin-left: auto;
+  }
+
+  .details[open] .arrow svg {
+    transform: rotate(180deg);
+  }
+
+  .arrow svg {
+    transition: transform 0.2s ease;
+  }
+
+  .icon {
+    display: flex;
+    align-items: center;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .content {
+    overflow: hidden;
+    transition: height 0.3s ease-out;
+    padding: 0 0.75rem 0.75rem 0;
+    /* border-top: 1px solid; */
+    margin-top: 0 !important;
+    border-color: inherit;
+  }
+</style>

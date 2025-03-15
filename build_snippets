@@ -1,0 +1,4 @@
+#! /bin/bash
+
+# This script is used to build the snippets for the documentation.
+python3 tools/snippet-parser/main.py -o snippets.json

@@ -1,24 +1,30 @@
-//@s outer-snip
-This is the outer snippet content.  
 
-class something {whoops} ;
+
+//@s snip
+extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeAMDGPUTarget() {
+    InitializeAMDGPUTarget();
+}
 namespace llvm {
-    class ABC {
 
-    void otherFunction(int a,
-    int b) {
-        //@s  inner-snip1  
-        printf("the inner snip1");
-        //-  inner-snip1  
+int maindef();
+// line
+}
+class Something {
+    bool doFunction() const {
+        return true;
+//- snip
     }
-    Continuing with the outer snippet content.  
-    
-        //@s inner-snip2  
-        This is the second inner snippet content.  
-        printf("the inner snip1");
-        //- inner-snip2  
-}
-Finishing the outer snippet content.  
-//-  outer-snip  
-}
+
+    void longName(int param,
+                  int param2,
+                  int param3);
+
+    bool operator==(const Something& other) const {
+        return true;
+    }
+    void operator()(int param) {
+        inside the function;
+    }
+};
+
 

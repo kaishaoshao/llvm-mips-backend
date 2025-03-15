@@ -2,59 +2,180 @@
 import fs from "node:fs/promises";
 import { Code as DefaultCode } from "@astrojs/starlight/components";
 
-const { id } = Astro.props;
+const { id, mark = "unlikely-string", noContext = false, noIns = false } = Astro.props;
 
 import { getEntry } from "astro:content";
 import { readSnippet } from "../util/read-snippet.ts";
+import type { MarkerLineOrRange } from "@expressive-code/plugin-text-markers";
 
 const snippet = await getEntry("snippets", id);
-
+if (!snippet) {
+    throw new Error(`Snippet with id ${id} not found`);
+}
 const snippetData = await readSnippet(snippet!.data);
-console.log(snippetData);
+
+// console.log(snippetData);
 
 const before = snippetData.surrounding.before;
 const after = snippetData.surrounding.after;
-let contextLine = snippetData.context;
-const contextLength = contextLine.at(-1) == "\n" ? 1 : 0;
 
-if (contextLength > 0) {
-    contextLine = ">> " + contextLine.trim() + "\n";
-} else {
-    contextLine = ">> new file";
+let contextStack = snippetData.contextStack;
+let hasAfterContext = contextStack.find((c) => c.type === "AFTER");
+////////////// Context manipulation /////////////////////////
+// if there is no context, make it empty []
+if (contextStack.length === 1) {
+    const c = contextStack[0]
+    if (c.type === "NONE")
+        contextStack = [{text: ">> add at top level in file", type: "NONE"}];
 }
 
-const code = `${before}${snippetData.snippet}${after}`;
-const len = code.split("\n").length;
-const markRange = `${before.split("\n").length}-${len - 1 - snippetData.surrounding.lines}`;
+if (contextStack.length == 0) {
+    if (before === "") {
+        contextStack.push({text: ">> new file", type: "FILE"});
+    }
+}
+console.log(contextStack)
+////////////// End context manipulation /////////////////////////
 
-const filename = snippetData.filename.replace("/home/mirasma", "");
+////////////// Content manipulation ////////////////////
+// Construct the actual content with surroundings, remove, and the actual 
+// content
+let removed = null;
+let content = snippetData.snippet;
+
+switch (snippet.data.type) {
+    case "removed":
+        // this snippet was removed later, so strip all leading comments
+        // in the snippet data in snippetData.snippet
+        content = snippetData.snippet.split("\n").map((line) => {
+            if (line.trim().startsWith("//")) {
+                return line.slice(2);
+            } else if(line.trim().startsWith("#")) {
+                return line.slice(1);
+            }
+            return line;
+        }).join("\n");
+        break;
+    case "add":
+        // do nothing
+        break;
+    default:
+        if (snippet.data.type.startsWith("replace=")) {
+            const replaceId = snippet.data.type.split("replace=")[1];
+            const replacedSnippet = await getEntry("snippets", replaceId);
+            if (!replacedSnippet) {
+                throw new Error(`Snippet with id "${replaceId}" not found`);
+            }
+            const replacedSnippetData = await readSnippet(replacedSnippet!.data);
+            removed = replacedSnippetData.snippet;
+        }
+}
+const code = `${before}${removed??""}${content}${after}`;
+////////////// Content manipulation ////////////////////
+
+const filename = snippetData.filename;
+
 const lang = filename!.split(".").pop();
+
+////////////// Mark and Ins /////////////////////////
+// Set the mark and ins
+const len = code.trim().split("\n").length;
+const removeLen = !removed ? 0
+                    : removed.trimEnd().split("\n").length;
+const beforeLen = before.trim().length == 0 ? 0
+                    : (before.trimEnd().split("\n").length); // trim end because it ends with a \n
+const snipLen = snippet.data.end_lineno - snippet.data.start_lineno - 2;
+const snipRangeStart = beforeLen + removeLen + 1;
+const snipRangeEnd = snipRangeStart + snipLen;
+const markRange = `${snipRangeStart}-${snipRangeEnd}`;
+console.log("Mark for id " , id , " is " , removeLen)
+let finalMark = [];
+let finalIns: MarkerLineOrRange[] = [];
+let finalDels: MarkerLineOrRange[] = [];
+if (removed) {
+    finalDels = [{ range: `${beforeLen + 1}-${beforeLen + removeLen}` }];
+}
+if (noIns || snippet.data.type === "mark") {
+    // put everything into mark
+    finalMark =[{ range: markRange }, mark];
+} else {
+    finalMark = mark;
+    finalIns = [{ range: markRange }];
+}
 ---
 
 <style>
     .code-snippet {
         display: flex;
         flex-direction: column;
+        
         gap: 0rem;
+        /* padding: 0; */
         * {
             margin: 0 !important;
         }
-        .context {
+        .context, .after-context {
             background-color: var(--sl-color-gray-6);
             padding: calc(var(--ec-uiPadBlk) + var(--ec-frm-edActTabIndHt))
                 var(--ec-uiPadInl);
+            padding-left: calc(var(--ec-uiPadInl) - 0.6rem);
             font-family: var(--ec-codeFontFml);
             font-style: italic;
             font-size: calc(0.97 * var(--ec-codeFontSize));
+            /* disable text wrapping to next line */
+            white-space: pre-wrap;
+            /* overflow: hidden; */
+            text-align: left;
+        }
+        .after-context { 
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        @media screen and (max-width: 600px) {
+            & .context {
+                display: none;
+            }
         }
     }
 </style>
 <div class="code-snippet">
-    <div class="context">{contextLine}</div>
+    <!-- for the after context div -->
+    {
+        !noContext && hasAfterContext &&
+        <div class="after-context">
+            <span>↓ after {contextStack[0].text}</span><span></span>
+        </div>
+    }
+    <!-- for other contexts -->
+    {
+        !noContext && contextStack.length > 0  && !hasAfterContext &&
+    <div class="context">
+    {contextStack.map((context, i) => {
+        let prefix = "  ".repeat(i);
+        let ctype = context.type;
+
+        if (ctype === "NONE"){
+            // return <span></span>
+        }
+        
+        else if (ctype !== "FILE" && i === 0) {
+            prefix = "→ "
+        }
+        else if (i > 0) {
+            prefix += "↳ ";
+        }
+        return (<span>{prefix + context.text}</span><br/>)
+    })}</div>
+    }
     <DefaultCode
         code={code}
-        title={filename}
+        title={filename + `(${id})`}
         lang={"cpp"}
-        mark={{ range: markRange }}
+        mark={finalMark}
+        ins={finalIns}
+        del={finalDels}
     />
 </div>

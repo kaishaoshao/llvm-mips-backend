@@ -22,3 +22,5 @@ pnpm-debug.log*
 
 # Folders that I use for local experimentation
 me_lua/
+*.log
+tools/build/
