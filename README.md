@@ -1,45 +1,71 @@
-# Starlight Starter Kit: Basics
+# LLVM to MipsNova
+
+This repository contains the source for the tutorial series on writing a 
+backend for LLVM that compiles to MIPS Release 1 assembly.
+
+This serves as a guide to anyone interested in developing a backend for LLVM.
+
+The name of this backend is `Nova`, just to distinguish from the already existing
+`Mips` backend. (Most of the code is derived from that)
 
 [![Built with Starlight](https://astro.badg.es/v2/built-with-starlight/tiny.svg)](https://starlight.astro.build)
 
-```
-npm create astro@latest -- --template starlight
-```
+## Running locally
+The code snippets for the pages are extracted and embedded into
+the webpage source by reading code enclosed within special
+snippet comments in the LLVM source.
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/starlight/tree/main/examples/basics)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/starlight/tree/main/examples/basics)
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/withastro/starlight&create_from_path=examples/basics)
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fwithastro%2Fstarlight%2Ftree%2Fmain%2Fexamples%2Fbasics&project-name=my-starlight-docs&repository-name=my-starlight-docs)
+This repository has currently checked in the `snippets.json` file
+that stores all these extracted snippets, but this might change later.
+(in fact, probably *should* change later)
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+You can skip steps 1 and 4 if you just want to build and develop the 
+website content without changing the code for the Nova backend.
 
-## 🚀 Project Structure
-
-Inside of your Astro + Starlight project, you'll see the following folders and files:
-
-```
-.
-├── public/
-├── src/
-│   ├── assets/
-│   ├── content/
-│   │   ├── docs/
-│   └── content.config.ts
-├── astro.config.mjs
-├── package.json
-└── tsconfig.json
+1. Clone the llvm-project directory.
+```bash
+cd llvm-mips-tutorial # or whatever you name this
+                      # book-tutorial-project's directory
+git clone --single-branch --branch mipsnova-backend https://github.com/optimisan/llvm-project.git
 ```
 
-Starlight looks for `.md` or `.mdx` files in the `src/content/docs/` directory. Each file is exposed as a route based on its file name.
+2. Clone this repository.
+```bash
+cd llvm-mips-tutorial
+git clone https://github.com/optimisan/llvm-mips-backend.git
+```
 
-Images can be added to `src/assets/` and embedded in Markdown with a relative link.
+3. Copy (or move) the `.env.example` to `.env`.
+```bash
+cd llvm-mips-tutorial/llvm-mips-backend # cd into this project
+cp .env.example .env
+open_with_editor .env
+```
 
-Static assets, like favicons, can be placed in the `public/` directory.
+Enter the absolute path to the `llvm-project` folder, for example, like this:
+```env
+# in file .env
+LLVM_ROOT_DIR=/home/username/llvm-mips-tutorial/llvm-project
+```
 
-## 🧞 Commands
+4. Build the snippets. Requires python and the `python-dotenv` package.
+```bash
+# optional: pip3 install python-dotenv 
+./build-snippets
+```
 
-All commands are run from the root of the project, from a terminal:
+5. Build and view the website!
+```bash
+npm install
+npm run dev
+```
 
+Open `localhost:4321` in your browser.
+
+## Snippets
+Look at [tools/snippet-parser/README.md](tools/snippet-parser/README.md) for the snippets syntax.
+
+## Other stuff that Astro added to this README
 | Command                   | Action                                           |
 | :------------------------ | :----------------------------------------------- |
 | `npm install`             | Installs dependencies                            |

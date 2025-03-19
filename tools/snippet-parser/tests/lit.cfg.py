@@ -1,4 +1,14 @@
 import lit.formats
+from dotenv import load_dotenv
+import os
+
+env_filepath = os.path.join(os.path.dirname(__file__), '..', '..', '..', '.env')
+print("env_filepath: ", env_filepath)
+res = load_dotenv(dotenv_path=env_filepath)
+if not res:
+    print("Error loading .env file")    
+    sys.exit(1)
+FILECHECK_PATH = os.environ.get("FILECHECK_PATH")
 
 config.name = 'SnippetParser'
 config.test_format = lit.formats.ShTest(True)
@@ -14,7 +24,7 @@ substitutions = [
 ('%parser',
     'python3 ' + os.path.join(config.test_source_root, '..', 'main.py')
 ),
-(r'%filecheck', '~/llvm-project/build/bin/FileCheck'),
+(r'%filecheck', FILECHECK_PATH),
 ]
 
 config.substitutions.extend(substitutions)

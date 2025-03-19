@@ -2,6 +2,38 @@
 The file `main.py` will read all snippets in the llvm dir on files listed by
 `git diff main --name-only`.
 
+## Running the snippet parser
+`main.py` either runs on the LLVM source repo (whose must be in the `.env` file),
+or can operate on a single file provided on the command line like so:
+
+```bash
+cd llvm-mips-tutorial
+cd tools/snippet-parser
+python3 main.py input.cpp [-d] [-o output.json]
+```
+
+### Testing
+There are a few tests written using the `llvm-lit` and `FileCheck` tool to
+test the parser. Look at `lit.cfg.py`.
+
+> You will need the `lit` and `FileCheck` tool for this. Here is what I did:
+> ```bash
+> pip install --user lit # to install lit
+> cd ../llvm-project
+> cmake --build build --target FileCheck
+> ```
+
+Enter the path to the `FileCheck` binary in the `.env` file in the 
+variable `FILECHECK_PATH`.
+```env
+FILECHECK_PATH="/path/to/bin/FileCheck"
+```
+Then you can run the lit tests:
+```bash
+cd llvm-mips-tutorial # root of this project
+lit -sv tools/snippet-parser/tests
+```
+
 ## Syntax
 Snippets are code blocks enclosed by special comments prefixed by `@s` (to start 
 a snippet) and `-` (to end the snippet).
