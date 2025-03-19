@@ -1,7 +1,8 @@
 import { z } from "astro:content";
+import { join } from "node:path";
 import fs from "node:fs/promises"
-import { after } from "node:test";
 
+const LLVM_ROOT_DIR = import.meta.env.LLVM_ROOT_DIR;
 const SURROUNDING_CONTEXT_LINES = 2;
 const LLVM_ROOT_DIR_NAME = "llvm-project"
 
@@ -76,6 +77,16 @@ function preProcessContexts(contexts: Context[]): string[] {
 }
 
 /**
+ * Convert relative path to absolute path for files in the
+ * LLVM_ROOT_DIR directory
+ * @param relativePath The relative path of the file
+ */
+function getAbsoluteFilepath(relativePath: string) {
+    // do this platform-independently
+    return join(LLVM_ROOT_DIR, relativePath);
+}
+
+/**
  * Reads the snippet from the source file. This does not follow any references
  * to other snippets (like in replace=other-snip-id)
  * @param snippet The snippet from snippets.json
@@ -85,7 +96,7 @@ export async function readSnippet(
     snippet: z.infer<typeof snippetType>,
     beforeContext: number = 2,
     afterContext: number = 2): Promise<SnippetContent> {
-    const text = await fs.readFile(snippet.filename, "utf-8");
+    const text = await fs.readFile(getAbsoluteFilepath(snippet.filename), "utf-8");
     const lines = text.split("\n");
     let startSnipI = snippet.start_lineno - 1;
     let endSnipI = snippet.end_lineno - 1;

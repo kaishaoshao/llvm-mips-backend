@@ -15,6 +15,8 @@
 # This script extracts all snippets and writes them to
 # snippets.json file.
 
+from dotenv import load_dotenv
+import os
 import argparse
 import logging
 import subprocess
@@ -27,6 +29,8 @@ import json
 
 debug = False
 logger = logging.getLogger(__name__)
+load_dotenv()
+LLVM_ROOT_DIR = os.environ.get("LLVM_ROOT_DIR")
 
 
 class Colors:
@@ -177,8 +181,14 @@ class Snippet:
 
 
 class FileSnippetReader:
-    def __init__(self, filepath: Path):
+    def __init__(self, filepath: Path, relative_filepath_str: str = None):
+        """
+        relative_filepath_str: Path to print in the JSON
+        """
         self.filepath = filepath
+        self.relative_filepath_str = relative_filepath_str
+        if relative_filepath_str is None:
+            self.relative_filepath_str = filepath.absolute().as_posix()
         # This points to the next line.
         # Current line is at self.i - 1, use self.peek_line() instead though.
         self.i = 0
@@ -252,7 +262,7 @@ class FileSnippetReader:
                         the_context.append(self.get_last_after_context())
                     stack.append(Snippet(name=start_match.group("name"),
                                          type=start_match.group("type"),
-                                         filename=filepath.absolute().as_posix(),
+                                         filename=self.relative_filepath_str,
                                          start_lineno=lineno,
                                          end_lineno=None,
                                          context_stack=the_context))
@@ -440,7 +450,8 @@ def extract_all_snippets_from_dir(llvm_dir: Path):
     all_snippets = []
     print(filepaths)
     for file in filepaths:
-        fileReader = FileSnippetReader(file)
+        rel_path = file.relative_to(llvm_dir).as_posix()
+        fileReader = FileSnippetReader(file, rel_path)
         all_snippets.extend(fileReader.to_dict())
     # print(all_snippets)
     return all_snippets
@@ -474,7 +485,7 @@ def main(llvm_dir_path: Path):
     # print(fileReader.to_dict())
 
 if __name__ == "__main__":
-    git_dir = "/home/mirasma/Projects/llvm-project"
+    # git_dir = "/home/mirasma/Projects/llvm-project"
     example_path = Path("./example.txt")
     args = parse_args(sys.argv[1:])
 
@@ -489,7 +500,11 @@ if __name__ == "__main__":
         all_snips = FileSnippetReader(Path(args.input)).to_dict()
         # writeOut(snippets.to_dict(), args.output)
     else:
-        all_snips = main(Path(git_dir))
+        if LLVM_ROOT_DIR:
+            all_snips = main(Path(LLVM_ROOT_DIR))
+        else:
+            print("Error: LLVM_ROOT_DIR is not set in the environment")
+            sys.exit(1)
 
     writeOut(all_snips, args.output)
 
