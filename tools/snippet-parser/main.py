@@ -1,7 +1,8 @@
 # the snippets format is
 # //@s snippet-name <type>
 # //- snippet-name
-# <type> = "mark" | "removed" | <replace>
+# <type> = "mark" | "removed" | <replace> | "end"
+# "end" => no after context should be shown
 # <replace> = "replace" "=" <snippet-id-this-replaces>
 # If type is "removed", leading comments in the snippet
 # will be removed while rendering in CodeSnippet.astro
@@ -63,8 +64,10 @@ def get_abs_filenames(llvm_dir: Path):
 
 
 class Regexes:
+    cpp_comments_filext = ['.cpp', '.h', '.td']
+    hash_comments_filext = ['.txt']
     cpp_prefix = r'^\s*\/\/'
-    td_prefix = r'^\s*#'
+    cmake_prefix = r'^\s*#'
     start_suffix = r'@s\s+(?P<name>[^ \s]+)(?P<type>\s+[^\s=]+(=[^=\s]+)?)?\s*$'
     end_suffix = r'-\s+([^ ]+)\s*$'
 
@@ -76,8 +79,8 @@ class Regexes:
     start_regex = re.compile(cpp_prefix + start_suffix)
     end_regex = re.compile(cpp_prefix + end_suffix)
 
-    td_start_regex = re.compile(td_prefix + start_suffix)
-    td_end_regex = re.compile(td_prefix + end_suffix)
+    td_start_regex = re.compile(cmake_prefix + start_suffix)
+    td_end_regex = re.compile(cmake_prefix + end_suffix)
 
     function_pattern = re.compile(
         r'((?:template\s*<.*>\s*)?(?:\w+(?:::\w+)*\s+)+\w+\s*\([^)]*\)(?:\s*const)?(?:\s*noexcept)?(?:\s*override)?(?:\s*final)?(?:\s*=\s*default)?(?:\s*=\s*delete)?)\s*{')
@@ -212,9 +215,9 @@ class FileSnippetReader:
         return self.last_context.copyWith(Context.Type.AFTER)
     
     def get_regex(self, start: bool):
-        if self.filepath.suffix == ".cpp" or self.filepath.suffix == ".h":
+        if self.filepath.suffix in Regexes.cpp_comments_filext:
             return Regexes.start_regex if start else Regexes.end_regex
-        elif self.filepath.suffix == ".td" or self.filepath.suffix == ".txt":
+        elif self.filepath.suffix in Regexes.hash_comments_filext:
             return Regexes.td_start_regex if start else Regexes.td_end_regex
         else:
             # throw error
@@ -282,6 +285,14 @@ class FileSnippetReader:
             return False
         line = comments[0]
         return line.strip().startswith("}")
+    
+    def ends_with_open_brace(self, line):
+        line = line.strip()
+        comments = line.split("//")
+        if len(comments) > 2:
+            return False
+        line = comments[0]
+        return line.strip().endswith("{")
 
     def consume_context(self):
         if self.filepath.suffix != ".cpp" and self.filepath.suffix != ".h":
@@ -290,19 +301,27 @@ class FileSnippetReader:
         # attempt to read the context
         # context can be a function or enum or class
         # line = self.lines[self.i]
+        class_regex = re.compile(r'^\s*(template<.+>)?\s?class')
+        class_forward = re.compile(r'^\s*(template<.+>\s?)?class\s+[\w_\d]+\s*;')
+        struct_regex = re.compile(r'^\s*(template<.+>)?\s+struct')
         if not self.is_at_end():
             line = self.peek_line().strip()
             # check for class
             context_type = None
             if line.startswith("//"):
                 return
-            elif line.startswith("class"):
+            elif line.startswith("#ifdef"):
+                context_type = Context.Type.ANONYMOUS
+            elif line.startswith("class") or (line.endswith("{") and "class " in line):
+                # ignore forward declarations
+                if class_forward.match(line):
+                    return
                 context_type = Context.Type.CLASS
             elif line.startswith("namespace"):
                 context_type = Context.Type.NAMESPACE
             elif line.startswith("enum"):
                 context_type = Context.Type.ENUM
-            elif line.startswith("struct"):
+            elif line.startswith("struct") or (line.endswith("{") and "struct " in line):
                 context_type = Context.Type.STRUCT
             elif line.startswith("union"):
                 context_type = Context.Type.UNION
@@ -320,6 +339,8 @@ class FileSnippetReader:
                     # or Regexes.multiline_function.match(line):
                     context_type = Context.Type.FUNCTION
                     # print("\t== found function at line", self.clineno(), self.filepath)
+                elif self.ends_with_open_brace(line):
+                    context_type = Context.Type.ANONYMOUS
             if context_type:
                 # print("found a context: ", line)
                 self.context_stack.append(

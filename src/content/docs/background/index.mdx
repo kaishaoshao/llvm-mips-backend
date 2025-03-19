@@ -35,6 +35,8 @@ cd llvm-project
 For some commands I include the output that I 
 get from it, which is displayed like so:
 
+
+
 ```bash withOutput title="Output below the command(s)"
 > echo "Hello World!"
 > echo "Output is after this code block"
@@ -43,6 +45,19 @@ Hello World!
 Output is after this code block
 ```
 
+## Code Snippets
+Code snippets are displayed in diff style shown below. Sometimes some sections are collapsed
+and can be expanded by clicking on the `X collapsed lines` indicator.
+
+The snippet's file path is shown above the code. Above the filename is the context,
+which can be the lexical scope or an action. For example,
+the context below implies that a new file should be created for this snippet.
+
+import CodeSnippet from "../../../components/CodeSnippet.astro";
+
+<CodeSnippet id="nova-tm-cpp" collapse={["2-3", "8-9", "13-14"]}/>
+
 ## Errata
 If you find any errors or have any suggestions, please let me know by creating an issue on the book's GitHub repository. PRs are also most welcome!
 <LinkCard href="https://github.com/optimisan/llvm-mips-backend" title="View the GitHub Repository for this book" />
+

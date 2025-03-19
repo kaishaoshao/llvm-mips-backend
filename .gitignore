@@ -23,4 +23,6 @@ pnpm-debug.log*
 # Folders that I use for local experimentation
 me_lua/
 *.log
-tools/build/
+# build/ includes all folders named
+# "build" anywhere in the project
+build/

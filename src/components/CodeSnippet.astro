@@ -2,7 +2,13 @@
 import fs from "node:fs/promises";
 import { Code as DefaultCode } from "@astrojs/starlight/components";
 
-const { id, mark = "unlikely-string", noContext = false, noIns = false } = Astro.props;
+const { id,
+        beforeContext = 2,
+        afterContext = 2,
+        collapse = [],
+        mark = "unlikely-string",
+        noContext = false,
+        noIns = false } = Astro.props;
 
 import { getEntry } from "astro:content";
 import { readSnippet } from "../util/read-snippet.ts";
@@ -12,7 +18,7 @@ const snippet = await getEntry("snippets", id);
 if (!snippet) {
     throw new Error(`Snippet with id ${id} not found`);
 }
-const snippetData = await readSnippet(snippet!.data);
+const snippetData = await readSnippet(snippet!.data, beforeContext, afterContext);
 
 // console.log(snippetData);
 
@@ -83,12 +89,13 @@ const len = code.trim().split("\n").length;
 const removeLen = !removed ? 0
                     : removed.trimEnd().split("\n").length;
 const beforeLen = before.trim().length == 0 ? 0
-                    : (before.trimEnd().split("\n").length); // trim end because it ends with a \n
+                    : (before.trimStart().split("\n").length) - 1; // trim end because it ends with a \n
 const snipLen = snippet.data.end_lineno - snippet.data.start_lineno - 2;
 const snipRangeStart = beforeLen + removeLen + 1;
 const snipRangeEnd = snipRangeStart + snipLen;
 const markRange = `${snipRangeStart}-${snipRangeEnd}`;
-console.log("Mark for id " , id , " is " , removeLen)
+if (id === "create-nova-td")
+    console.log("Mark for id " , id , " is " , beforeLen)
 let finalMark = [];
 let finalIns: MarkerLineOrRange[] = [];
 let finalDels: MarkerLineOrRange[] = [];
@@ -172,6 +179,8 @@ if (noIns || snippet.data.type === "mark") {
     }
     <DefaultCode
         code={code}
+        collapse={collapse}
+        collapseStyle={"collapsible-auto"}
         title={filename + `(${id})`}
         lang={"cpp"}
         mark={finalMark}

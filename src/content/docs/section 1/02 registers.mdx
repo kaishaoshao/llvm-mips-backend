@@ -1,0 +1,179 @@
+---
+title: "Adding Registers"
+description: Adding registers for the Nova architecture.
+---
+import CodeSnippet from "../../../components/CodeSnippet.astro";
+import Details from "../../../components/Collapsible.astro";
+import {LinkCard} from "@astrojs/starlight/components";
+
+We now have our triple registered with `llc`. To compile a program, we need
+to add our target details so that `llc` knows how to generate code.
+
+This chapter will add registers to the Nova backend.
+
+<LinkCard href="https://www.cs.unibo.it/~solmi/teaching/arch_2002-2003/AssemblyLanguageProgDoc.pdf"
+  title="Reference for the MIPS architecture"
+  target="_blank"/>
+
+## Registers
+The CPU has 32 registers (that are 32-bit). The general-purpose registers have the names `$0` to `$31` and also have aliases.
+
+We add all these registers in the `NovaRegisterInfo.td` file.
+
+### The `Register` class
+First, create the top level `Nova.td` file. This pulls in all other
+tablegen files.
+
+<CodeSnippet id="create-nova-td"/>
+
+We have to enumerate our registers as records of the class `Register` defined in `llvm/include/llvm/Target/Target.td`.
+
+The fields of interest to us are:
+- `string Namespace` - the target namespace (Nova in our case)
+- `string AsmName` - the assembly name of the register ($zero, $1 etc.)
+- `list<string> AltNames` - aliases for the register
+- `list<Register> SubRegs` - subregisters of the register
+- `bit isConstant` - whether the register holds a constant value
+<CodeSnippet id="nova-registers" collapse="11-36"/>
+
+With this, we can see the tablgen records for the registers.
+
+```bash title="Viewing the tablegen output" withOutput
+> cd llvm/lib/Target/Nova
+> ../../../../build/bin/llvm-tblgen Nova.td -I=../../../include -print-records | grep Nova
+
+def A0 {        // Register NovaGPRReg
+  string Namespace = "Nova";
+  string AsmName = "4";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+```
+
+Next, we need to group these registers into register classes.
+## Register classes (RC)
+{/* https://groups.google.com/g/llvm-dev/c/PZEoHQNCXIs/m/2Rr1W3rYAgAJ?pli=1 */}
+A register class is a set of registers that can be used interchangeably in an instruction. For example, the `GPR` register class contains all the general-purpose registers.
+
+- All virtual registers have a register class assigned.
+
+- The register allocator also uses the RC to allocate physical registers.
+
+- A new register class needs to be created for defining register constraints.
+
+Our general purpose registers will go into the `GPR32` register
+class which is defined as a tablgen record deriving from the 
+`RegisterClass` class.
+
+<CodeSnippet id="nova-reg-class"/>
+
+`"Nova"` is the namespace for the generated definitions by tablgen.
+
+Next, we mention the type of values these registers can hold. 
+For our case, these are all 32-bit integers.
+
+<CodeSnippet id="nova-reg-class1"/>
+
+The alignment of the register is set to 4 bytes.
+
+<CodeSnippet id="nova-reg-class2"/>
+
+Now we list all the registers in this class.
+
+<CodeSnippet id="nova-reg-class3" beforeContext={3}/>
+
+### Other Register classes
+Since we need constraints on allocation (`$zero` should always be an operand 0),
+we need another register class for it.
+
+<CodeSnippet id="nova-rc-zero" beforeContext={3}/>
+
+For the rest, we need another class. We can be clever here and
+use the set difference operator instead of listing all of them again.
+
+<CodeSnippet id="nova-rc-nonzero"/>
+
+#### Unallocatable registers
+Special registers like `$ra` are not to be allocatd by the register allocator to virtual registers.
+
+<CodeSnippet id="nova-rc-unalloc"/>
+
+## Generating the `.inc` file
+
+import {Icon} from "@astrojs/starlight/components";
+
+🚀 We have our basic register definitions in place!
+
+To generate the enum values for our registers, we need to instruct cmake to invoke
+`llvm-tblgen` on our `Nova.td` file.
+
+### TableGen output
+To generate our register file into, we use the `-gen-register-info` TableGen backend.
+
+<LinkCard href="https://llvm.org/docs/TableGen/BackEnds.html#registerinfo" title="Register Info TableGen backend"/>
+
+Let's see what we get from this backend. Run `llvm-tblgen` with our top level td file 
+with the backend enabled.
+```bash title="Register info from td"
+cd llvm/lib/Target/Nova
+../../../../build/bin/llvm-tblgen Nova.td -I=../../../include -gen-register-info > reg.h
+
+```
+
+⏭️ We'll take a look at `reg.h` to see what gets generated.
+
+## LLVM Classes
+We see that there is a class named `MCRegisterClass` that is being forward declared. This class is defined in `llvm/include/llvm/MC/MCRegisterInfo.h`. Let's work our way through this file and related files to understand the register classes in LLVM.
+
+All these classes are in the `MC` layer. The `MC` layer is the Machine Code layer in LLVM. It is responsible for generating machine code for the target architecture and is used to for the lowest level of code generation.
+
+### Representing Registers
+Registers are represented as `unsigned` integers in LLVM. Have a look
+at the small `MCRegister.h` file.
+
+- `MCPhysReg` is a physical register number.
+- `MCRegUnit` is a register unit number. We'll see this later.
+- `MCRegister` wraps an unsigned integer as a physical register.
+
+The unsigned values are divided into ranges to designate different types of registers:
+
+- 0 stands for no register used. (Not-A-Register)
+- [1;2^30) are all physical registers (assigned by TableGen).
+- [2^31;2^32) are virtual registers.
+
+<details>
+<summary>Show source</summary>
+<CodeSnippet id="mc-register"/>
+</details>
+
+#### Register Class
+The `MCRegisterClass` denotes the register class and mirrors the `RegisterClass` in the `Target.td` file.
+
+#### Register Description
+The `MCRegisterDesc` class is used to describe the register.
+It contains the Name, SubRegs and SuperRegs along with other details.
+
+### `MCRegisterInfo`
+A static array of `MCRegisterDesc` is used to define all registers in the target.
+This class tracks a pointer to that array.
+
+Most of this class is boilerplate code to access the register descriptions,
+used by the TableGen backend. Some methods in this class are:
+
+```cpp
+  /// This method should return the register where the return
+  /// address can be found.
+  MCRegister getRARegister() const;
+
+  /// Return the register which is the program counter.
+  MCRegister getProgramCounter() const;
+
+  /// Return the number of registers this target has (useful for
+  /// sizing arrays holding per register information)
+  unsigned getNumRegs() const;
+```
+
+We can now look at `reg.h`, the generated file.
+
+### Generated file
+Enums are behind the `REGINFO_ENUM` directive.

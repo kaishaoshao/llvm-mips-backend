@@ -13,6 +13,23 @@
     "type": "add"
   },
   {
+    "id": "mc-register",
+    "filename": "/home/mirasma/Projects/llvm-project/llvm/include/llvm/MC/MCRegister.h",
+    "start_lineno": 40,
+    "end_lineno": 56,
+    "context_stack": [
+      {
+        "type": "NAMESPACE",
+        "line": 17
+      },
+      {
+        "type": "CLASS",
+        "line": 33
+      }
+    ],
+    "type": "mark"
+  },
+  {
     "id": "something",
     "filename": "/home/mirasma/Projects/llvm-project/llvm/include/llvm/TargetParser/Triple.h",
     "start_lineno": 19,
@@ -117,7 +134,20 @@
         "line": 0
       }
     ],
-    "type": "add"
+    "type": "removed"
+  },
+  {
+    "id": "nova-cmake",
+    "filename": "/home/mirasma/Projects/llvm-project/llvm/lib/Target/Nova/CMakeLists.txt",
+    "start_lineno": 21,
+    "end_lineno": 25,
+    "context_stack": [
+      {
+        "type": "NONE",
+        "line": 0
+      }
+    ],
+    "type": "end"
   },
   {
     "id": "nova-tm-cpp",
@@ -128,6 +158,157 @@
       {
         "type": "NONE",
         "line": 0
+      }
+    ],
+    "type": "add"
+  },
+  {
+    "id": "create-nova-td",
+    "filename": "/home/mirasma/Projects/llvm-project/llvm/lib/Target/Nova/Nova.td",
+    "start_lineno": 1,
+    "end_lineno": 13,
+    "context_stack": [
+      {
+        "type": "NONE",
+        "line": 0
+      }
+    ],
+    "type": "end"
+  },
+  {
+    "id": "nova-registers",
+    "filename": "/home/mirasma/Projects/llvm-project/llvm/lib/Target/Nova/NovaRegisterInfo.td",
+    "start_lineno": 1,
+    "end_lineno": 52,
+    "context_stack": [
+      {
+        "type": "NONE",
+        "line": 0
+      }
+    ],
+    "type": "end"
+  },
+  {
+    "id": "nova-reg-class",
+    "filename": "/home/mirasma/Projects/llvm-project/llvm/lib/Target/Nova/NovaRegisterInfo.td",
+    "start_lineno": 55,
+    "end_lineno": 61,
+    "context_stack": [
+      {
+        "type": "NONE",
+        "line": 0
+      }
+    ],
+    "type": "end"
+  },
+  {
+    "id": "nova-reg-class1",
+    "filename": "/home/mirasma/Projects/llvm-project/llvm/lib/Target/Nova/NovaRegisterInfo.td",
+    "start_lineno": 62,
+    "end_lineno": 64,
+    "context_stack": [
+      {
+        "type": "NONE",
+        "line": 0
+      }
+    ],
+    "type": "end"
+  },
+  {
+    "id": "nova-reg-class2",
+    "filename": "/home/mirasma/Projects/llvm-project/llvm/lib/Target/Nova/NovaRegisterInfo.td",
+    "start_lineno": 65,
+    "end_lineno": 67,
+    "context_stack": [
+      {
+        "type": "NONE",
+        "line": 0
+      }
+    ],
+    "type": "end"
+  },
+  {
+    "id": "nova-reg-class3",
+    "filename": "/home/mirasma/Projects/llvm-project/llvm/lib/Target/Nova/NovaRegisterInfo.td",
+    "start_lineno": 68,
+    "end_lineno": 91,
+    "context_stack": [
+      {
+        "type": "NONE",
+        "line": 0
+      }
+    ],
+    "type": "end"
+  },
+  {
+    "id": "nova-rc-zero",
+    "filename": "/home/mirasma/Projects/llvm-project/llvm/lib/Target/Nova/NovaRegisterInfo.td",
+    "start_lineno": 93,
+    "end_lineno": 95,
+    "context_stack": [
+      {
+        "type": "NONE",
+        "line": 0
+      }
+    ],
+    "type": "end"
+  },
+  {
+    "id": "nova-rc-nonzero",
+    "filename": "/home/mirasma/Projects/llvm-project/llvm/lib/Target/Nova/NovaRegisterInfo.td",
+    "start_lineno": 97,
+    "end_lineno": 99,
+    "context_stack": [
+      {
+        "type": "NONE",
+        "line": 0
+      }
+    ],
+    "type": "end"
+  },
+  {
+    "id": "nova-rc-unalloc",
+    "filename": "/home/mirasma/Projects/llvm-project/llvm/lib/Target/Nova/NovaRegisterInfo.td",
+    "start_lineno": 101,
+    "end_lineno": 108,
+    "context_stack": [
+      {
+        "type": "NONE",
+        "line": 0
+      }
+    ],
+    "type": "add"
+  },
+  {
+    "id": "reg.h-regs",
+    "filename": "/home/mirasma/Projects/llvm-project/llvm/lib/Target/Nova/reg.h",
+    "start_lineno": 18,
+    "end_lineno": 30,
+    "context_stack": [
+      {
+        "type": "ANONYMOUS",
+        "line": 10
+      },
+      {
+        "type": "NAMESPACE",
+        "line": 13
+      }
+    ],
+    "type": "add"
+  },
+  {
+    "id": "reg.h-rc",
+    "filename": "/home/mirasma/Projects/llvm-project/llvm/lib/Target/Nova/reg.h",
+    "start_lineno": 60,
+    "end_lineno": 74,
+    "context_stack": [
+      {
+        "type": "ANONYMOUS",
+        "line": 10
+      },
+      {
+        "type": "NAMESPACE",
+        "line": 13
       }
     ],
     "type": "add"

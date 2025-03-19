@@ -32,7 +32,7 @@ interface Range {
 async function readLines(filename: string, ranges: Range[]) {
     const text = await fs.readFile(filename, "utf-8");
     // create array the same length of lines
-    const lineTexts: string[] = new Array(ranges.length); 
+    const lineTexts: string[] = new Array(ranges.length);
     // Subtract one from each start since it starts from 1
     // and we count from 0
     ranges.forEach(range => range.start = range.start - 1)
@@ -81,20 +81,26 @@ function preProcessContexts(contexts: Context[]): string[] {
  * @param snippet The snippet from snippets.json
  * @returns SnippetContent object with the snip content, context
  */
-export async function readSnippet(snippet: z.infer<typeof snippetType>) : Promise<SnippetContent> {
+export async function readSnippet(
+    snippet: z.infer<typeof snippetType>,
+    beforeContext: number = 2,
+    afterContext: number = 2): Promise<SnippetContent> {
     const text = await fs.readFile(snippet.filename, "utf-8");
     const lines = text.split("\n");
     let startSnipI = snippet.start_lineno - 1;
     let endSnipI = snippet.end_lineno - 1;
-    let resSnipetText = lines.slice(startSnipI+1, endSnipI).join("\n") + '\n';
+    let resSnipetText = lines.slice(startSnipI + 1, endSnipI).join("\n") + '\n';
     let resContextText = "a\nb\nc\n";
-    const getBeforeContext = (startI: number, incrementDirection: number = -1) => {
+    const getBeforeContext = (startI: number,
+        incrementDirection: number = -1,
+        contextLength: number = SURROUNDING_CONTEXT_LINES
+    ) => {
         let res = [];
         let taken = 0;
         for (let i = startI;
-                taken < SURROUNDING_CONTEXT_LINES && i >= 0 && i < lines.length;
-              i += incrementDirection
-            ) {
+            taken < contextLength && i >= 0 && i < lines.length;
+            i += incrementDirection
+        ) {
             let line = lines[i];
             let trimmed = line.trimStart()
             if (trimmed.startsWith("//@s") || trimmed.startsWith("//-")) {
@@ -108,12 +114,14 @@ export async function readSnippet(snippet: z.infer<typeof snippetType>) : Promis
         if (incrementDirection === -1) {
             res.reverse();
         }
+        res[res.length - 1] = res.at(-1)?.slice(0) ?? res.at(-1);
         return res.join("");
     }
     let surrounding = {
-        before: getBeforeContext(startSnipI - 1, -1),
-        after: getBeforeContext(endSnipI + 1, 1),
+        before: getBeforeContext(startSnipI - 1, -1, beforeContext),
+        after: getBeforeContext(endSnipI + 1, 1, (snippet.type === "end") ? 0 : afterContext),
     }
+
     let contextStack = [];
     for (const context of snippet.context_stack) {
         if (context.type === "NONE") continue;
@@ -134,7 +142,7 @@ export async function readSnippet(snippet: z.infer<typeof snippetType>) : Promis
     }
 }
 
-export async function readSnippet1(snippet: z.infer<typeof snippetType>) : Promise<SnippetContent> {
+export async function readSnippet1(snippet: z.infer<typeof snippetType>): Promise<SnippetContent> {
     const text = await fs.readFile(snippet.filename, "utf-8");
     let context_start = snippet.context_stack.at(-1)?.line ?? -1;
     let contextStarts: number[] = [];

@@ -32,8 +32,7 @@ import {Aside, Card} from "@astrojs/starlight/components";
 <Aside title="In the source">
 The `llvm::Triple` class is defined in `llvm/include/llvm/TargetParser/Triple.h`.
 
-This page basically restates and explains the doc comment for the `llvm::Triple` class.
-But read on, because we will add our target in this chapter.
+You can read more about Target Triples [here](https://wiki.osdev.org/Target_Triplet).
 </Aside>
 
 ## Triples
@@ -185,8 +184,18 @@ cmake -S llvm -B build -G Ninja \
 cmake --build build --target llc
 ```
 
-Now we can run `llc` with the `mipsnova` target.
+Now we can see our target listed in the `llc` help output like so:
+```bash withOutput "mipsnova"
+> build/bin/llc -version
+...
+   mipsel   - MIPS (32-bit little endian)
+   mipsnova - MipsNova (32-bit big endian)
+   x86      - 32-bit X86: Pentium-Pro and above
+...
+```
 
+<Details title="Running llc with mipsnova">
+You can try running the following:
 ```bash "-mtriple=mipsnova" withOutput
 > build/bin/llc -mtriple=mipsnova < /dev/null
 
@@ -196,7 +205,7 @@ Stack dump:
  #0 0x000056117674c440 llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (build/bin/llc+0x1dce440)
 ...
 ```
-<Details title="What happened?">
+<Details title="What happened?" type='danger'>
 The target machine for `mipsnova` is not implemented yet. We will get to that in the next section.
 
 Before registering the target, we would get this error:
@@ -204,7 +213,8 @@ Before registering the target, we would get this error:
 llc: error: unable to get target for 'mipsnova', see --version and --triple.
 ```
 </Details>
-This won't work yet because we haven't implemented the target machine for `mipsnova`,
+</Details>
+Compiling won't work yet because we haven't implemented the target machine for `mipsnova`,
 but `llc` now accepts our target triple!
 
 {/* Our target's name is `NovaMips` instead of `MipsNova` because of a weird error I suspect because of the common prefix with the existing `Mips` target.
