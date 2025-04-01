@@ -40,9 +40,18 @@ if (contextStack.length == 0) {
         contextStack.push({text: ">> new file", type: "FILE"});
     }
 }
-console.log(contextStack)
 ////////////// End context manipulation /////////////////////////
 
+function stripLeadingComments(content: String) {
+    return content.split("\n").map((line) => {
+            if (line.trim().startsWith("//")) {
+                return line.slice(2);
+            } else if(line.trim().startsWith("#")) {
+                return line.slice(1);
+            }
+            return line;
+        }).join("\n");
+}
 ////////////// Content manipulation ////////////////////
 // Construct the actual content with surroundings, remove, and the actual 
 // content
@@ -53,17 +62,15 @@ switch (snippet.data.type) {
     case "removed":
         // this snippet was removed later, so strip all leading comments
         // in the snippet data in snippetData.snippet
-        content = snippetData.snippet.split("\n").map((line) => {
-            if (line.trim().startsWith("//")) {
-                return line.slice(2);
-            } else if(line.trim().startsWith("#")) {
-                return line.slice(1);
-            }
-            return line;
-        }).join("\n");
+        content = stripLeadingComments(snippetData.snippet)
         break;
     case "add":
         // do nothing
+        break;
+
+    case "delete":
+        removed = stripLeadingComments(content);
+        content = "";
         break;
     default:
         if (snippet.data.type.startsWith("replace=")) {
@@ -94,8 +101,8 @@ const snipLen = snippet.data.end_lineno - snippet.data.start_lineno - 2;
 const snipRangeStart = beforeLen + removeLen + 1;
 const snipRangeEnd = snipRangeStart + snipLen;
 const markRange = `${snipRangeStart}-${snipRangeEnd}`;
-if (id === "create-nova-td")
-    console.log("Mark for id " , id , " is " , beforeLen)
+// if (id === "create-nova-td")
+    // console.log("Mark for id " , id , " is " , beforeLen)
 let finalMark = [];
 let finalIns: MarkerLineOrRange[] = [];
 let finalDels: MarkerLineOrRange[] = [];

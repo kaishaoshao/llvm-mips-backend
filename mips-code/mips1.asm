@@ -3,7 +3,7 @@
 .globl main
 .data
 n: .word 4                             # number of test cases
-ins:  .word    0,   5,   10,      100  # input numbers
+insp:  .word    0,   5,   10,      100  # input numbers
 outs: .word    0, 170, 2640, 25164150  # expected result
 failmsg: .asciiz "failed for test input: "
 expectedmsg: .asciiz ". expected "
@@ -12,7 +12,7 @@ okmsg: .asciiz "all tests passed"
 .text
 runner:
         lw      $s0, n
-        la      $s1, ins
+        la      $s1, insp
         la      $s2, outs
 run_test:
         lw      $s3, 0($s1)             # read input from memory

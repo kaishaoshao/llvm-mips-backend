@@ -51,6 +51,7 @@ def generate_lines(filename):
         for line in f:
             yield line
 
+IGNORE_FILES = ['.png']
 
 def get_abs_filenames(llvm_dir: Path):
     """
@@ -59,19 +60,22 @@ def get_abs_filenames(llvm_dir: Path):
     """
 
     command = "git diff main --name-only".split(" ")
-    print(" ".join(command))
+    logger.info(" ".join(command))
     res = subprocess.run(command, capture_output=True, cwd=llvm_dir)
     filenames = res.stdout.decode().strip().split("\n")
-    print(filenames)
     filenames = [llvm_dir/Path(f) for f in filenames]
+    # filter with suffixes
+    filenames = [f for f in filenames if f.suffix not in IGNORE_FILES]
     return filenames
 
 
+def get_reg_start(comment_chars: str):
+    return r'^\s*' + comment_chars
 class Regexes:
     cpp_comments_filext = ['.cpp', '.h', '.td']
     hash_comments_filext = ['.txt']
-    cpp_prefix = r'^\s*\/\/'
-    cmake_prefix = r'^\s*#'
+    cpp_prefix = get_reg_start("//")
+    cmake_prefix = get_reg_start("#")
     start_suffix = r'@s\s+(?P<name>[^ \s]+)(?P<type>\s+[^\s=]+(=[^=\s]+)?)?\s*$'
     end_suffix = r'-\s+([^ ]+)\s*$'
 
@@ -85,6 +89,9 @@ class Regexes:
 
     td_start_regex = re.compile(cmake_prefix + start_suffix)
     td_end_regex = re.compile(cmake_prefix + end_suffix)
+
+    ll_start_regex = re.compile(get_reg_start(";") + start_suffix)
+    ll_end_regex = re.compile(get_reg_start(";") + end_suffix)
 
     function_pattern = re.compile(
         r'((?:template\s*<.*>\s*)?(?:\w+(?:::\w+)*\s+)+\w+\s*\([^)]*\)(?:\s*const)?(?:\s*noexcept)?(?:\s*override)?(?:\s*final)?(?:\s*=\s*default)?(?:\s*=\s*delete)?)\s*{')
@@ -108,6 +115,7 @@ def get_indent(line: str):
 
 
 class Context:
+    ONLY_INCLUDE_FILES = ['.cpp', '.h']
     class Type(Enum):
         NONE = 20
         AFTER = 12  # this is for top level contexts outside namespaces
@@ -229,9 +237,11 @@ class FileSnippetReader:
             return Regexes.start_regex if start else Regexes.end_regex
         elif self.filepath.suffix in Regexes.hash_comments_filext:
             return Regexes.td_start_regex if start else Regexes.td_end_regex
+        elif self.filepath.suffix in ['.ll', '.s']:
+            return Regexes.ll_start_regex if start else Regexes.ll_end_regex
         else:
             # throw error
-            Colors.error(f"Error: Unknown file extension {self.filepath.suffix}")
+            logger.fatal(Colors.error(f"Error: Unknown file extension {self.filepath.suffix}"))
             sys.exit(1)
 
     def extract_file_snippets(self, filepath: Path):
@@ -241,7 +251,8 @@ class FileSnippetReader:
         snippets: List[Snippet] = []
         stack: List[Snippet] = []
         current_context: str = None
-
+        print(filepath)
+        # return []
         with open(filepath, 'r') as f:
             self.lines = f.readlines()
             # begin loop
@@ -268,9 +279,9 @@ class FileSnippetReader:
                                          context_stack=the_context))
                 elif end_match:
                     if not stack:
-                        print(f"Error: line {lineno}: Found end snippet without start")
-                        print(f"Snippet name: {end_match.group(1)}")
-                        print(f"Snippet file: {self.filepath}")
+                        logger.error(f"{Colors.RED}Error: line {lineno}: Found end snippet without start")
+                        logger.error(f"Snippet name: {end_match.group(1)}")
+                        logger.error(f"Snippet file: {self.filepath}{Colors.ENDC}")
                         sys.exit(1)
                     end_line = lineno
                     snippets.append(stack.pop().withEndLine(end_line))
@@ -306,6 +317,9 @@ class FileSnippetReader:
 
     def consume_context(self):
         if self.filepath.suffix != ".cpp" and self.filepath.suffix != ".h":
+            print("ignoring")
+            return
+        if self.filepath.suffix not in Context.ONLY_INCLUDE_FILES:
             return
 
         # attempt to read the context
@@ -448,7 +462,7 @@ class FileSnippetReader:
 def extract_all_snippets_from_dir(llvm_dir: Path):
     filepaths = get_abs_filenames(llvm_dir)
     all_snippets = []
-    print(filepaths)
+    # print(filepaths)
     for file in filepaths:
         rel_path = file.relative_to(llvm_dir).as_posix()
         fileReader = FileSnippetReader(file, rel_path)
@@ -467,11 +481,16 @@ def parse_args(args):
                         help="Path to the input file. If not provided, the LLVM code will be taken.")
     parser.add_argument("-d", "--dump-contexts", action="store_true",
                         help="Enable debug mode", default=False)
+    parser.add_argument("-v", "--verbose", action="store_true",
+                        help="Enable logging", default=False)
+    parser.add_argument("--diff", action="store_true", help="Print the diff file list that would be scanned otherwise",
+                        default=False)
     return parser.parse_args(args)
 
 
 def writeOut(snippets: dict, filename: str):
     # if filename is -, write to stdout
+    print("writing out")
     if filename == "-":
         print(json.dumps(snippets, indent=2))
     else:
@@ -484,15 +503,23 @@ def main(llvm_dir_path: Path):
     # fileReader = FileSnippetReader(Path(llvm_dir_path))
     # print(fileReader.to_dict())
 
-if __name__ == "__main__":
+def driver():
     # git_dir = "/home/mirasma/Projects/llvm-project"
     example_path = Path("./example.txt")
     args = parse_args(sys.argv[1:])
 
-    level = logging.INFO
+    if args.verbose:
+        level = logging.INFO
+    else:
+        level = logging.CRITICAL
     if args.dump_contexts:
         level = logging.DEBUG
     logging.basicConfig(level=level)
+
+    if args.diff:
+        print(get_abs_filenames(LLVM_ROOT_DIR))
+        return 0
+
     # logging.info(args)
     debug = args.dump_contexts
     all_snips = {}
@@ -504,7 +531,12 @@ if __name__ == "__main__":
             all_snips = main(Path(LLVM_ROOT_DIR))
         else:
             print("Error: LLVM_ROOT_DIR is not set in the environment")
-            sys.exit(1)
+            return 1
 
     writeOut(all_snips, args.output)
+    return 0
 
+
+
+if __name__ == "__main__":
+    sys.exit(driver())

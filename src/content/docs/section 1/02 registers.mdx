@@ -173,7 +173,45 @@ used by the TableGen backend. Some methods in this class are:
   unsigned getNumRegs() const;
 ```
 
+### The generated file
 We can now look at `reg.h`, the generated file.
 
-### Generated file
-Enums are behind the `REGINFO_ENUM` directive.
+Enums are behind the `GET_REGINFO_*` directive in the generated file.
+
+We have the following things generated for us by tablegen:
+
+1. The register enums `Nova::AT, Nova::RA, Nova::PC` etc.
+2. Register class enums `Nova::GPR32RegClassID, Nova::CPURARegRegClassID` etc.
+3. Under `GET_REGINFO_MC_DESC`, we have the `InitNovaMCRegisterInfo` function that initializes the `MCRegisterInfo`
+instance for our backend. (these are the definitions, so need to go in a cpp file)
+4. In `GET_REGINFO_HEADER`, The `NovaGenRegisterInfo` class definition, and
+5. Register classes `TargetRegisterClass GPR32RegisterClass` and others.
+6. In `GET_REGINFO_TARGET_DESC`, some functions like `getRegUnitWeight(unsigned RegUnit)` and the constructor
+for `NovaGenRegisterInfo`.
+7. Other functions like `getFrameLowering()`: returns a `NovaFrameLowering` object.
+
+### Add to cmake
+Tell cmake to generate the register info file.
+<CodeSnippet id='cmake-reg-info'/>
+
+## Adding the NovaRegisterInfo class
+
+First, add the `NovaGenRegisterInfo` class declaration.
+
+<CodeSnippet id="reg-info1"/>
+Remember to add this to CMakelists.txt as well.
+<CodeSnippet id="cmake-reg-info-cpp"/>
+Add the `NovaRegisterInfo` class.
+
+<CodeSnippet id="reg-info2" beforeContext={4}/>
+
+Revisit this later when we start to lower call and return instructions.
+
+Now we register our RegisterInfo class with our target.
+First, remove stand-in method we added earlier and move
+it to a new file `NovaMCTargetDesc.cpp`. This file contains
+all the target description classes for registers
+instructions.
+<CodeSnippet id="deleted-mc-init"/>
+
+<CodeSnippet id="nova-mc-tdesc-1"/>

@@ -144,7 +144,7 @@ export async function readSnippet(
     return {
         snippet: resSnipetText,
         contextStack,
-        filename: getRelativeFilename(snippet),
+        filename: snippet.filename,
         surrounding: {
             lines: SURROUNDING_CONTEXT_LINES,
             before: surrounding.before,
