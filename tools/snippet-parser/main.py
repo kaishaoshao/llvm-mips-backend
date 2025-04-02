@@ -26,6 +26,7 @@ from pathlib import Path
 import re
 from enum import Enum, auto
 import json
+import time
 
 debug = False
 logger = logging.getLogger(__name__)
@@ -187,6 +188,22 @@ class Snippet:
             "type": self.type
         }
 
+class Statistics:
+    def __init__(self):
+        self.snippets = 0
+        self.files = 0
+
+    def addSnippet(self):
+        self.snippets += 1
+
+    def addFile(self):
+        self.files += 1
+    
+    def print(self):
+        print(f"Statistics:")
+        print(f"\t{self.snippets} snippets from {self.files} files.")
+
+STATS = Statistics()
 
 class FileSnippetReader:
     def __init__(self, filepath: Path, relative_filepath_str: str = None):
@@ -251,8 +268,6 @@ class FileSnippetReader:
         snippets: List[Snippet] = []
         stack: List[Snippet] = []
         current_context: str = None
-        print(filepath)
-        # return []
         with open(filepath, 'r') as f:
             self.lines = f.readlines()
             # begin loop
@@ -316,9 +331,6 @@ class FileSnippetReader:
         return line.strip().endswith("{")
 
     def consume_context(self):
-        if self.filepath.suffix != ".cpp" and self.filepath.suffix != ".h":
-            print("ignoring")
-            return
         if self.filepath.suffix not in Context.ONLY_INCLUDE_FILES:
             return
 
@@ -462,12 +474,13 @@ class FileSnippetReader:
 def extract_all_snippets_from_dir(llvm_dir: Path):
     filepaths = get_abs_filenames(llvm_dir)
     all_snippets = []
-    # print(filepaths)
+    STATS.files = len(filepaths)
     for file in filepaths:
         rel_path = file.relative_to(llvm_dir).as_posix()
         fileReader = FileSnippetReader(file, rel_path)
         all_snippets.extend(fileReader.to_dict())
-    # print(all_snippets)
+
+    STATS.snippets += len(all_snippets)
     return all_snippets
 
 def parse_args(args):
@@ -490,12 +503,14 @@ def parse_args(args):
 
 def writeOut(snippets: dict, filename: str):
     # if filename is -, write to stdout
-    print("writing out")
     if filename == "-":
         print(json.dumps(snippets, indent=2))
     else:
         with open(filename, "w") as f:
             json.dump(snippets, f, indent=2)
+        print(f"Written to {filename}")
+        STATS.print()
+        print(f"{Colors.BLUE}\tin {time.time() - START_TIME} seconds.")
 
 def main(llvm_dir_path: Path):
     all_snippets = extract_all_snippets_from_dir(llvm_dir_path)
@@ -503,7 +518,10 @@ def main(llvm_dir_path: Path):
     # fileReader = FileSnippetReader(Path(llvm_dir_path))
     # print(fileReader.to_dict())
 
+START_TIME = 0
 def driver():
+    global START_TIME
+    START_TIME = time.time()
     # git_dir = "/home/mirasma/Projects/llvm-project"
     example_path = Path("./example.txt")
     args = parse_args(sys.argv[1:])

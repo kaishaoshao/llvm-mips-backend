@@ -86,6 +86,23 @@ function getAbsoluteFilepath(relativePath: string) {
     return join(LLVM_ROOT_DIR, relativePath);
 }
 
+const suffixMarkerStart = ['//', '#', ';']
+/**
+ * Whether this line is a snippet marker comment
+ * @param trimmedLine The line of code, trimmed
+ */
+function isSnippetMarkerLine(trimmedLine: string) {
+    const line = trimmedLine;
+    for (const startMarker of suffixMarkerStart) {
+        for (const identifier of ["@s", "-"]) {
+            if (line.startsWith(startMarker + identifier)) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 /**
  * Reads the snippet from the source file. This does not follow any references
  * to other snippets (like in replace=other-snip-id)
@@ -116,6 +133,8 @@ export async function readSnippet(
             let trimmed = line.trimStart()
             if (trimmed.startsWith("//@s") || trimmed.startsWith("//-")) {
                 // this is a snippet part, so skip this line
+                continue;
+            } else if (isSnippetMarkerLine(trimmed)) {
                 continue;
             } else {
                 res.push(line + "\n");

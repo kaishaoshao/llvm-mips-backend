@@ -59,7 +59,7 @@ let removed = null;
 let content = snippetData.snippet;
 
 switch (snippet.data.type) {
-    case "removed":
+    case "commented":
         // this snippet was removed later, so strip all leading comments
         // in the snippet data in snippetData.snippet
         content = stripLeadingComments(snippetData.snippet)
@@ -80,7 +80,7 @@ switch (snippet.data.type) {
                 throw new Error(`Snippet with id "${replaceId}" not found`);
             }
             const replacedSnippetData = await readSnippet(replacedSnippet!.data);
-            removed = replacedSnippetData.snippet;
+            removed = stripLeadingComments(replacedSnippetData.snippet);
         }
 }
 const code = `${before}${removed??""}${content}${after}`;

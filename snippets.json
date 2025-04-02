@@ -163,6 +163,19 @@
     "type": "end"
   },
   {
+    "id": "cmake-mc-tdesc",
+    "filename": "llvm/lib/Target/Nova/CMakeLists.txt",
+    "start_lineno": 34,
+    "end_lineno": 36,
+    "context_stack": [
+      {
+        "type": "NONE",
+        "line": 0
+      }
+    ],
+    "type": "add"
+  },
+  {
     "id": "create-nova-td",
     "filename": "llvm/lib/Target/Nova/Nova.td",
     "start_lineno": 1,
@@ -179,7 +192,7 @@
     "id": "create-reginfo",
     "filename": "llvm/lib/Target/Nova/NovaMCTargetDesc.cpp",
     "start_lineno": 1,
-    "end_lineno": 11,
+    "end_lineno": 23,
     "context_stack": [
       {
         "type": "NONE",
@@ -345,6 +358,19 @@
     "type": "add"
   },
   {
+    "id": "nova-target-info",
+    "filename": "llvm/lib/Target/Nova/NovaTargetInfo.h",
+    "start_lineno": 1,
+    "end_lineno": 14,
+    "context_stack": [
+      {
+        "type": "NONE",
+        "line": 0
+      }
+    ],
+    "type": "add"
+  },
+  {
     "id": "nova-tm-cpp",
     "filename": "llvm/lib/Target/Nova/NovaTargetMachine.cpp",
     "start_lineno": 1,
@@ -368,7 +394,46 @@
         "line": 0
       }
     ],
-    "type": "delete"
+    "type": "commented"
+  },
+  {
+    "id": "old-get-the-nova",
+    "filename": "llvm/lib/Target/Nova/NovaTargetMachine.cpp",
+    "start_lineno": 32,
+    "end_lineno": 34,
+    "context_stack": [
+      {
+        "type": "NONE",
+        "line": 0
+      }
+    ],
+    "type": "removed"
+  },
+  {
+    "id": "nova-target-info-tm",
+    "filename": "llvm/lib/Target/Nova/NovaTargetMachine.cpp",
+    "start_lineno": 36,
+    "end_lineno": 38,
+    "context_stack": [
+      {
+        "type": "NONE",
+        "line": 0
+      }
+    ],
+    "type": "add"
+  },
+  {
+    "id": "new-get-the-nova",
+    "filename": "llvm/lib/Target/Nova/NovaTargetMachine.cpp",
+    "start_lineno": 46,
+    "end_lineno": 48,
+    "context_stack": [
+      {
+        "type": "NONE",
+        "line": 0
+      }
+    ],
+    "type": "replace=old-get-the-nova"
   },
   {
     "id": "reg.h-regs",

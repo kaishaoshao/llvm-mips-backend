@@ -54,11 +54,40 @@ add_executable(main.cpp)
 
 Snippets can take a type, specified after the snippet name.
 ```
-<type> = "mark" | "removed" | <replace> | "end"
+<type> = <replace> | <keyword>
 <replace> = "replace" "=" <snip-id>
 <snip-id> = [^\s=]
+<keyword> = "delete" | "commented" | "mark" | "end"
 ```
 Types are listed below.
+
+### `delete`
+For code that is supposed to be deleted, comment it out and use the
+`delete` type on that snippet. This will be shown as a subtractive diff.
+```cpp
+#include "Nova.h"
+//@s removed-include delete
+// #include "NoLongerNeeded.h"
+//- removed-include
+#include "Other.h"
+```
+will show as
+```diff
+  #include "Nova.h"
+- #include "NoLongerNeeded.h"
+  #include "Other.h"
+```
+
+### `commented`
+The snippet will be un-commented and shown as a normal snippet.
+(with the additive diff)
+
+```cpp
+//@s snippet commented
+// int X = constant();
+// return func(X+a);
+//- snippet
+```
 
 ### `mark`
 With `mark`, the snippet will be highlighted with a mark range intead of
@@ -68,9 +97,9 @@ added or removed)
 ### `end`
 Type `end` means no after-context will be shown in the final code snippet.
 
-### `removed`
-This will be shown as a removed diff in the snippet.
-
 ### `replace=snip-id`
-If type is "removed", leading comments in the snippet
-will be removed while rendering in CodeSnippet.astro
+This indicates that the current snippet replaces the snippet 
+marked with `snip-id`. This will show `snip-id` with the removal
+diff style and the current snippet as addition.
+The replaced snippet should be commented-out code.
+
