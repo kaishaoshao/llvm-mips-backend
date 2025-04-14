@@ -208,11 +208,12 @@ Add the `NovaRegisterInfo` class.
 Revisit this later when we start to lower call and return instructions.
 
 Now we register our RegisterInfo class with our target.
+
 First, remove stand-in method we added earlier and move
 it to a new file `NovaMCTargetDesc.cpp`. This file contains
 all the target description classes for registers
 instructions.
-<CodeSnippet id="deleted-mc-init"/>
+<CodeSnippet id="deleted-mc-init" beforeContext={1}/>
 
 <CodeSnippet id="nova-mc-tdesc-1"/>
 Register the Nova's `MCRegisterInfo` class instance in its corresponding 
@@ -228,3 +229,21 @@ Move the target getters to a new file so we can reuse them.
 <CodeSnippet id="nova-target-info"/>
 Fix our definition written earlier:
 <CodeSnippet id="new-get-the-nova"/>
+<CodeSnippet id="reginfo-cpp1"/>
+
+Since the `NovaGenRegisterInfo` (which drives from `TargetRegisterInfo`) refers to `NovaFrameLowering`,
+we need to add that class.
+<CodeSnippet id="nova-frame-lowering-1"/>
+
+With this, you can successfully compile llc for the `Nova` target.
+
+The `build` folder should have the tablegen'erated file for the register info.
+
+```bash withOutput
+> cmake --build build --target llc
+> find build -name "NovaGenRegisterInfo.inc"
+
+build/lib/Target/Nova/NovaGenRegisterInfo.inc
+```
+
+Let's move on to add the instructions for Nova.

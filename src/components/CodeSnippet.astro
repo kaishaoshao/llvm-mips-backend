@@ -44,10 +44,10 @@ if (contextStack.length == 0) {
 
 function stripLeadingComments(content: String) {
     return content.split("\n").map((line) => {
-            if (line.trim().startsWith("//")) {
+            if (line.trim().startsWith("// ")) {
+                return line.slice(3);
+            } else if(line.trim().startsWith("# ")) {
                 return line.slice(2);
-            } else if(line.trim().startsWith("#")) {
-                return line.slice(1);
             }
             return line;
         }).join("\n");
@@ -60,6 +60,7 @@ let content = snippetData.snippet;
 
 switch (snippet.data.type) {
     case "commented":
+    case "removed":
         // this snippet was removed later, so strip all leading comments
         // in the snippet data in snippetData.snippet
         content = stripLeadingComments(snippetData.snippet)
@@ -101,8 +102,10 @@ const snipLen = snippet.data.end_lineno - snippet.data.start_lineno - 2;
 const snipRangeStart = beforeLen + removeLen + 1;
 const snipRangeEnd = snipRangeStart + snipLen;
 const markRange = `${snipRangeStart}-${snipRangeEnd}`;
-// if (id === "create-nova-td")
-    // console.log("Mark for id " , id , " is " , beforeLen)
+if (id === "deleted-mc-init") {
+    console.log(markRange)
+}
+
 let finalMark = [];
 let finalIns: MarkerLineOrRange[] = [];
 let finalDels: MarkerLineOrRange[] = [];
@@ -112,6 +115,8 @@ if (removed) {
 if (noIns || snippet.data.type === "mark") {
     // put everything into mark
     finalMark =[{ range: markRange }, mark];
+} else if (snippet.data.type === "delete") {
+    finalIns = [];
 } else {
     finalMark = mark;
     finalIns = [{ range: markRange }];

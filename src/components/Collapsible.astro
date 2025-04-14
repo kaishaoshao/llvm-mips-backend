@@ -2,9 +2,10 @@
 interface Props {
   title: string;
   type?: 'note' | 'tip' | 'warning' | 'danger';
+  defaultOpen?: boolean;
 }
 
-const { title, type = 'note' } = Astro.props;
+const { title, type = 'note', defaultOpen = false } = Astro.props;
 
 const icons = {
   note: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M8 8.5v-4"/><path d="M8 11.5v-.5"/></svg>`,
@@ -19,9 +20,11 @@ const colors = {
   warning: 'details--warning',
   danger: 'details--danger'
 };
+
+const openAttr = defaultOpen ? {open: ''} : {};
 ---
 
-<details class={`details ${colors[type]}`}>
+<details class={`details ${colors[type]}`} {...openAttr}>
   <summary class="details-summary">
     <span class="icon" set:html={icons[type]} />
     <span class="title">{title}</span>

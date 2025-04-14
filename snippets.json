@@ -13,6 +13,64 @@
     "type": "add"
   },
   {
+    "id": "the-lower-return",
+    "filename": "llvm/include/llvm/CodeGen/TargetLowering.h",
+    "start_lineno": 4823,
+    "end_lineno": 4835,
+    "context_stack": [
+      {
+        "type": "NAMESPACE",
+        "line": 64
+      },
+      {
+        "type": "ENUM",
+        "line": 69
+      },
+      {
+        "type": "ENUM",
+        "line": 70
+      },
+      {
+        "type": "ENUM",
+        "line": 79
+      },
+      {
+        "type": "CLASS",
+        "line": 3813
+      },
+      {
+        "type": "ENUM",
+        "line": 3815
+      },
+      {
+        "type": "ENUM",
+        "line": 3816
+      },
+      {
+        "type": "FUNCTION",
+        "line": 4189
+      },
+      {
+        "type": "FUNCTION",
+        "line": 4208
+      }
+    ],
+    "type": "mark"
+  },
+  {
+    "id": "value-types-1",
+    "filename": "llvm/include/llvm/CodeGen/ValueTypes.td",
+    "start_lineno": 74,
+    "end_lineno": 91,
+    "context_stack": [
+      {
+        "type": "NONE",
+        "line": 0
+      }
+    ],
+    "type": "mark"
+  },
+  {
     "id": "mc-register",
     "filename": "llvm/include/llvm/MC/MCRegister.h",
     "start_lineno": 40,
@@ -189,10 +247,49 @@
     "type": "end"
   },
   {
+    "id": "nova-frame-lowering-1",
+    "filename": "llvm/lib/Target/Nova/NovaFrameLowering.h",
+    "start_lineno": 1,
+    "end_lineno": 22,
+    "context_stack": [
+      {
+        "type": "NONE",
+        "line": 0
+      }
+    ],
+    "type": "add"
+  },
+  {
+    "id": "nova-instr-info-1",
+    "filename": "llvm/lib/Target/Nova/NovaInstrInfo.td",
+    "start_lineno": 1,
+    "end_lineno": 7,
+    "context_stack": [
+      {
+        "type": "NONE",
+        "line": 0
+      }
+    ],
+    "type": "add"
+  },
+  {
+    "id": "nova-isel-lowering-1",
+    "filename": "llvm/lib/Target/Nova/NovaIselLowering.h",
+    "start_lineno": 1,
+    "end_lineno": 37,
+    "context_stack": [
+      {
+        "type": "NONE",
+        "line": 0
+      }
+    ],
+    "type": "add"
+  },
+  {
     "id": "create-reginfo",
     "filename": "llvm/lib/Target/Nova/NovaMCTargetDesc.cpp",
     "start_lineno": 1,
-    "end_lineno": 23,
+    "end_lineno": 24,
     "context_stack": [
       {
         "type": "NONE",
@@ -218,7 +315,7 @@
     "id": "reginfo-cpp1",
     "filename": "llvm/lib/Target/Nova/NovaRegisterInfo.cpp",
     "start_lineno": 1,
-    "end_lineno": 12,
+    "end_lineno": 16,
     "context_stack": [
       {
         "type": "NONE",
@@ -394,13 +491,13 @@
         "line": 0
       }
     ],
-    "type": "commented"
+    "type": "delete"
   },
   {
     "id": "old-get-the-nova",
     "filename": "llvm/lib/Target/Nova/NovaTargetMachine.cpp",
-    "start_lineno": 32,
-    "end_lineno": 34,
+    "start_lineno": 33,
+    "end_lineno": 35,
     "context_stack": [
       {
         "type": "NONE",
@@ -412,8 +509,8 @@
   {
     "id": "nova-target-info-tm",
     "filename": "llvm/lib/Target/Nova/NovaTargetMachine.cpp",
-    "start_lineno": 36,
-    "end_lineno": 38,
+    "start_lineno": 37,
+    "end_lineno": 39,
     "context_stack": [
       {
         "type": "NONE",

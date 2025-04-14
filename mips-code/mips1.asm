@@ -21,7 +21,7 @@ run_test:
         move    $v1, $v0                # move return value in v0 to v1 because we need v0 for syscall
         lw      $s4, 0($s2)             # read expected output from memory
         bne     $v1, $s4, exit_fail     # if expected doesn't match actual, jump to fail
-        addi    $s1, $s1, 4             # move to next word in input
+        addi    $s1, $s1, 2+2             # move to next word in input
         addi    $s2, $s2, 4             # move to next word in output
         sub     $s0, $s0, 1             # decrement num of tests left to run
         bgt     $s0, $zero, run_test    # if more than zero tests to run, jump to run_test

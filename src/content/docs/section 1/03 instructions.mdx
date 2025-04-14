@@ -6,3 +6,74 @@ import CodeSnippet from "../../../components/CodeSnippet.astro";
 import Details from "../../../components/Collapsible.astro";
 import {LinkCard} from "@astrojs/starlight/components";
 
+
+<Details title="Instruction encodings" defaultOpen={true}>
+Since we are not going to generate object code yet, we do not need to 
+write the instruction encodings.
+</Details>
+
+To support instruction selection for the `Nova` target, we have to write
+some tablegen and C++ code. Here is what we have to do:
+
+1. Write instructions in `NovaInstrInfo.td`. These should cover all
+instructions we want to support from the MIPS ISA.
+2. We don't need encodings, so we move to the next step.
+3. Write matching patterns in `NovaInstrPats.td` and `NovaISelDAGToDAG.cpp`. This is where we will
+   implement the instruction selection.
+4. Write the `NovaISelDAGToDAG.cpp` file to implement the instruction selection.
+5. Write the `NovaISelLowering.cpp` file to implement the instruction lowering.
+
+
+## Jump and Branch Instructions
+
+First we need to create our TargetLowering class to tell
+LLVM how to select instructions.
+
+<CodeSnippet id="nova-isel-lowering-1"/>
+
+Add the instructions in the td file.
+
+<CodeSnippet id="nova-instr-info-1"/>
+
+<Details title="Glue and chains">
+<LinkCard
+   href="https://groups.google.com/g/llvm-dev/c/F-GU_LiLOLs/m/CVETl5FwCQAJ"
+   title="LLVM: Glue and chains"
+   />
+> Chains represent a dependency between nodes that can't be represented by a data dependency. For example a load following a store that might alias with the address of the load. The store must happen before the load. So the load's chain input is dependent on the store's chain output either directly or through other intermediate nodes that also have chain inputs and outputs. There can be multiple chains in parallel in the DAG. TokenFactor nodes are used to merge separate chains. The InstrEmitter ensures that the chain dependency is satisfied when emitting the linear instruction sequence after isel. But nothing guarantees that parallel chains won't be interleaved. After a node is schedule all of the nodes dependent on it either through data or chain are checked to see if they are now ready to schedule. The scheduler will pick from the ready to schedule nodes without any concern for whether they were on the same chain as the last node scheduled.
+>
+> Glue is stricter, it says that two nodes must be scheduled adjacent to each other in the linear instruction sequence.
+
+</Details>
+
+We now have to tell LLVM how to lower return instructions. This is done in the `TargetLowering` class.
+
+<Details title="See the virtual method in TargetLowering">
+This method must be implemented by targets.
+
+
+<CodeSnippet noContext id="the-lower-return"/>
+
+</Details>
+
+But first, let's see how target calling conventions are defined.
+
+Here are some types that are used for calling-convention information.
+
+1. `ISD::ArgFlagsTy` - This is a bitset that contains information about the argument. It is used to
+   determine how the argument should be passed to the function.
+
+2. `ISD::InputArg` - This struct contains the flags and type information about a single incoming (formal) argument or incoming return value virtual register.
+
+There are two fundamental classes that are used to represent types in LLVM: `MVT` and `EVT`.
+
+#### MVT
+From the documentation:
+> Machine Value Type. Every type that is supported natively by some
+> processor targeted by LLVM occurs here. This means that any legal value
+> type can be represented by an MVT.
+
+It is basically a single `uint16_t` value that is used to represent the type. We can see all types listed in
+`ValueTypes.td`. We can query the properties of the type using the `MVT` class methods. Some of them are pasted here for reference:
+
+<CodeSnippet id="value-types-1" collapse="5-17"/>
