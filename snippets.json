@@ -13,6 +13,57 @@
     "type": "add"
   },
   {
+    "id": "arg-flags",
+    "filename": "llvm/include/llvm/CodeGen/TargetCallingConv.h",
+    "start_lineno": 27,
+    "end_lineno": 35,
+    "context_stack": [
+      {
+        "type": "NAMESPACE",
+        "line": 24
+      },
+      {
+        "type": "NAMESPACE",
+        "line": 25
+      }
+    ],
+    "type": "mark"
+  },
+  {
+    "id": "input-arg",
+    "filename": "llvm/include/llvm/CodeGen/TargetCallingConv.h",
+    "start_lineno": 200,
+    "end_lineno": 215,
+    "context_stack": [
+      {
+        "type": "NAMESPACE",
+        "line": 24
+      },
+      {
+        "type": "NAMESPACE",
+        "line": 25
+      }
+    ],
+    "type": "mark"
+  },
+  {
+    "id": "output-arg",
+    "filename": "llvm/include/llvm/CodeGen/TargetCallingConv.h",
+    "start_lineno": 237,
+    "end_lineno": 254,
+    "context_stack": [
+      {
+        "type": "NAMESPACE",
+        "line": 24
+      },
+      {
+        "type": "NAMESPACE",
+        "line": 25
+      }
+    ],
+    "type": "add"
+  },
+  {
     "id": "the-lower-return",
     "filename": "llvm/include/llvm/CodeGen/TargetLowering.h",
     "start_lineno": 4823,
@@ -37,22 +88,44 @@
       {
         "type": "CLASS",
         "line": 3813
+      }
+    ],
+    "type": "mark"
+  },
+  {
+    "id": "evt-members",
+    "filename": "llvm/include/llvm/CodeGen/ValueTypes.h",
+    "start_lineno": 35,
+    "end_lineno": 40,
+    "context_stack": [
+      {
+        "type": "NAMESPACE",
+        "line": 26
       },
       {
         "type": "ENUM",
-        "line": 3815
+        "line": 30
+      }
+    ],
+    "type": "mark"
+  },
+  {
+    "id": "evt-init-1",
+    "filename": "llvm/include/llvm/CodeGen/ValueTypes.h",
+    "start_lineno": 43,
+    "end_lineno": 46,
+    "context_stack": [
+      {
+        "type": "NAMESPACE",
+        "line": 26
       },
       {
         "type": "ENUM",
-        "line": 3816
+        "line": 30
       },
       {
-        "type": "FUNCTION",
-        "line": 4189
-      },
-      {
-        "type": "FUNCTION",
-        "line": 4208
+        "type": "ENUM",
+        "line": 36
       }
     ],
     "type": "mark"
@@ -158,12 +231,8 @@
     "end_lineno": 161,
     "context_stack": [
       {
-        "type": "NAMESPACE",
+        "type": "AFTER",
         "line": 118
-      },
-      {
-        "type": "FUNCTION",
-        "line": 151
       }
     ],
     "type": "add"
@@ -175,7 +244,7 @@
     "end_lineno": 173,
     "context_stack": [
       {
-        "type": "NAMESPACE",
+        "type": "AFTER",
         "line": 118
       }
     ],
@@ -198,7 +267,7 @@
     "id": "cmake-reg-info",
     "filename": "llvm/lib/Target/Nova/CMakeLists.txt",
     "start_lineno": 21,
-    "end_lineno": 27,
+    "end_lineno": 29,
     "context_stack": [
       {
         "type": "NONE",
@@ -210,8 +279,8 @@
   {
     "id": "cmake-reg-info-cpp",
     "filename": "llvm/lib/Target/Nova/CMakeLists.txt",
-    "start_lineno": 31,
-    "end_lineno": 33,
+    "start_lineno": 33,
+    "end_lineno": 35,
     "context_stack": [
       {
         "type": "NONE",
@@ -223,21 +292,47 @@
   {
     "id": "cmake-mc-tdesc",
     "filename": "llvm/lib/Target/Nova/CMakeLists.txt",
-    "start_lineno": 34,
-    "end_lineno": 36,
+    "start_lineno": 36,
+    "end_lineno": 38,
     "context_stack": [
       {
         "type": "NONE",
         "line": 0
       }
     ],
-    "type": "add"
+    "type": "end"
+  },
+  {
+    "id": "cmake-subtarget",
+    "filename": "llvm/lib/Target/Nova/CMakeLists.txt",
+    "start_lineno": 39,
+    "end_lineno": 41,
+    "context_stack": [
+      {
+        "type": "NONE",
+        "line": 0
+      }
+    ],
+    "type": "end"
+  },
+  {
+    "id": "cmake-isel-lowering",
+    "filename": "llvm/lib/Target/Nova/CMakeLists.txt",
+    "start_lineno": 42,
+    "end_lineno": 44,
+    "context_stack": [
+      {
+        "type": "NONE",
+        "line": 0
+      }
+    ],
+    "type": "end"
   },
   {
     "id": "create-nova-td",
     "filename": "llvm/lib/Target/Nova/Nova.td",
     "start_lineno": 1,
-    "end_lineno": 13,
+    "end_lineno": 17,
     "context_stack": [
       {
         "type": "NONE",
@@ -250,7 +345,7 @@
     "id": "nova-frame-lowering-1",
     "filename": "llvm/lib/Target/Nova/NovaFrameLowering.h",
     "start_lineno": 1,
-    "end_lineno": 22,
+    "end_lineno": 30,
     "context_stack": [
       {
         "type": "NONE",
@@ -263,7 +358,33 @@
     "id": "nova-instr-info-1",
     "filename": "llvm/lib/Target/Nova/NovaInstrInfo.td",
     "start_lineno": 1,
-    "end_lineno": 7,
+    "end_lineno": 18,
+    "context_stack": [
+      {
+        "type": "NONE",
+        "line": 0
+      }
+    ],
+    "type": "add"
+  },
+  {
+    "id": "nova-isel-lowering-cpp-1",
+    "filename": "llvm/lib/Target/Nova/NovaIselLowering.cpp",
+    "start_lineno": 1,
+    "end_lineno": 14,
+    "context_stack": [
+      {
+        "type": "NONE",
+        "line": 0
+      }
+    ],
+    "type": "add"
+  },
+  {
+    "id": "nova-isel-lowering-cpp-2",
+    "filename": "llvm/lib/Target/Nova/NovaIselLowering.cpp",
+    "start_lineno": 16,
+    "end_lineno": 26,
     "context_stack": [
       {
         "type": "NONE",
@@ -276,7 +397,7 @@
     "id": "nova-isel-lowering-1",
     "filename": "llvm/lib/Target/Nova/NovaIselLowering.h",
     "start_lineno": 1,
-    "end_lineno": 37,
+    "end_lineno": 47,
     "context_stack": [
       {
         "type": "NONE",
@@ -341,7 +462,7 @@
     "id": "reg-info2",
     "filename": "llvm/lib/Target/Nova/NovaRegisterInfo.h",
     "start_lineno": 24,
-    "end_lineno": 36,
+    "end_lineno": 44,
     "context_stack": [
       {
         "type": "NONE",
@@ -446,6 +567,19 @@
     "filename": "llvm/lib/Target/Nova/NovaRegisterInfo.td",
     "start_lineno": 101,
     "end_lineno": 108,
+    "context_stack": [
+      {
+        "type": "NONE",
+        "line": 0
+      }
+    ],
+    "type": "add"
+  },
+  {
+    "id": "nova-subtarget-1",
+    "filename": "llvm/lib/Target/Nova/NovaSubtarget.h",
+    "start_lineno": 1,
+    "end_lineno": 51,
     "context_stack": [
       {
         "type": "NONE",
@@ -666,10 +800,6 @@
       {
         "type": "FUNCTION",
         "line": 1033
-      },
-      {
-        "type": "FUNCTION",
-        "line": 1034
       }
     ],
     "type": "add"

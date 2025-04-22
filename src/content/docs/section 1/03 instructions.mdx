@@ -60,14 +60,23 @@ But first, let's see how target calling conventions are defined.
 
 Here are some types that are used for calling-convention information.
 
-1. `ISD::ArgFlagsTy` - This is a bitset that contains information about the argument. It is used to
+#### 1. `ISD::ArgFlagsTy`
+This is a bitset that contains information about the argument. It is used to
    determine how the argument should be passed to the function.
+<Details title="ISD::ArgFlagsTy">
+<CodeSnippet noContext id="arg-flags"/>
+</Details>
 
-2. `ISD::InputArg` - This struct contains the flags and type information about a single incoming (formal) argument or incoming return value virtual register.
+#### 2. `ISD::InputArg`
+This struct contains the flags and type information about a single incoming (formal) argument or incoming return value virtual register.
 
+
+<details title="MVT and EVT">
+<summary>MVT and EVT</summary>
 There are two fundamental classes that are used to represent types in LLVM: `MVT` and `EVT`.
 
-#### MVT
+
+#### 1. MVT
 From the documentation:
 > Machine Value Type. Every type that is supported natively by some
 > processor targeted by LLVM occurs here. This means that any legal value
@@ -77,3 +86,99 @@ It is basically a single `uint16_t` value that is used to represent the type. We
 `ValueTypes.td`. We can query the properties of the type using the `MVT` class methods. Some of them are pasted here for reference:
 
 <CodeSnippet id="value-types-1" collapse="5-17"/>
+
+#### 2. EVT
+From the documentation:
+> Extended Value Type. Capable of holding value types which are not native
+> for any processor (such as the i12345 type), as well as the types an MVT
+> can represent.
+
+An EVT object holds an `MVT` value and an LLVM `Type` object.
+
+We can initialize an `EVT` object in two ways shown below. Note that they can be implicitly casted from `MVT`.
+<CodeSnippet noContext id="evt-init-1"/>
+The two fields start off invalid for the default constructor.
+<CodeSnippet noContext id="evt-members"/>
+We then have a number of methods to query the type. Some of them are:
+1. `isSimple()` - Returns true if the type is a simple type (i.e. not a vector or complex type).
+Here "extended" means that this is not an MVT type but an LLVMTy.
+2. `isInteger()` - Returns true if the type is an integer type.
+and so on.
+</details>
+
+<CodeSnippet noContext id="input-arg"/>
+
+#### 3. `ISD::OutputArg`
+Same as `ISD::InputArg`, but for outgoing arguments. It is used to determine how the argument should be passed to the function.
+<CodeSnippet noContext id="output-arg"/>
+
+
+The next major structure is the `SelectionDAG` that is passed to the `LowerReturn` method. Let's take a look at that.
+
+## `SelectionDAG`
+<Details title="Move this section" type="tip">
+This can be moved into its own page explaining the selection process.
+</Details>
+Each SDAG represents a single basic block in a function. In the instruction selection pipeline,
+the DAG is constructed from the LLVM IR. Then the DAG is transformed into a target-specific DAG.
+
+DAG is defined by the root and entry node.
+
+// write about printing and reading the dag.
+
+### Calling Conventions
+LLVM defines a number of common calling conventions, represented by the `CallingConv::ID` as an enum value.
+
+Some of them are `C`, `Fast`, `Cold` and some target-specific ones like `Win64` and `X86_64_SysV`. 
+
+**CCValAssign**
+This represents assignment of one arg/retval to a location.
+
+Let's now implement the `LowerReturn` method in our `TargetLowering` class.
+
+Setup the ISel Lowering file.
+<CodeSnippet id="nova-isel-lowering-1"/>
+Write the implementation.
+<CodeSnippet id="nova-isel-lowering-cpp-1"/>
+
+Now onto the LowerReturn method.
+
+Let's consider an example of a return statement that needs to be lowered.
+
+```llvm
+define i64 @rett(i32 %a, i32 %b) {
+entry:
+    %aext = zext i32 %a to i64
+    %bext = zext i32 %b to i64
+    %ret = add i64 %aext, %bext
+    ret i64 %ret
+}
+```
+This is converted into this selection DAG:
+```c {8,13}
+Initial selection DAG: %bb.0 'rett:entry'
+SelectionDAG has 17 nodes:
+  t0: ch,glue = EntryToken
+      t2: i32,ch = CopyFromReg t0, Register:i32 %0
+    t5: i64 = zero_extend t2
+      t4: i32,ch = CopyFromReg t0, Register:i32 %1
+    t6: i64 = zero_extend t4
+  t7: i64 = add t5, t6
+    t9: i32 = extract_element t7, Constant:i32<1>
+  t13: ch,glue = CopyToReg t0, Register:i32 $v0, t9
+    t11: i32 = extract_element t7, Constant:i32<0>
+  t15: ch,glue = CopyToReg t13, Register:i32 $v1, t11, t13:1
+  t16: ch = MipsISD::Ret t15, Register:i32 $v0, Register:i32 $v1, t15:1
+```
+We see that the return instruction returns two values for one i64 value. This is because the MIPS ABI requires that all values be returned in registers. The return value is split into two 32-bit values.
+
+The `LowerReturn` method is responsible for lowering the return instruction. It does this by iterating over the return values and creating a new `SDNode` for each value. The `SDNode` is then added to the DAG.
+
+<CodeSnippet id="nova-isel-lowering-cpp-2"/>
+
+To get this method running, we need to implement the `NovaTargetMachine` and `NovaSubtarget` classes. These classes are responsible for providing information about the target architecture and the target machine.
+
+## Subtarget
+Some part of the subtarget class is generated by tablegen.
+
+<CodeSnippet id="nova-subtarget-1"/>

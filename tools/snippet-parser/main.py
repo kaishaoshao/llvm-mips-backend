@@ -78,12 +78,12 @@ class Regexes:
     cpp_prefix = get_reg_start("//")
     cmake_prefix = get_reg_start("#")
     start_suffix = r'@s\s+(?P<name>[^ \s]+)(?P<type>\s+[^\s=]+(=[^=\s]+)?)?\s*$'
-    end_suffix = r'-\s+([^ ]+)\s*$'
+    end_suffix = r'-\s+([^ ]+)\s*\n?$'
 
     endings = ['{', '(', ',', ')'] # is for Triple::Triple(something) constructor syntax
     keywords = ['if', 'while', 'switch']
     
-    multiline_end = re.compile(r'^\s*[^)\n]+\)[^\n]*[;]$')
+    multiline_end = re.compile(r'^\s*[^)\n]+\)[^\n]*(;|(\{\}))?$')
 
     start_regex = re.compile(cpp_prefix + start_suffix)
     end_regex = re.compile(cpp_prefix + end_suffix)
@@ -282,7 +282,6 @@ class FileSnippetReader:
                 start_match = self.get_regex(start=True).match(line)
                 end_match = self.get_regex(start=False).match(line)
                 if start_match:
-                    # print("found match with context as ", len(self.context_stack))
                     the_context = self.context_stack.copy()
                     if the_context.__len__() == 0:
                         the_context.append(self.get_last_after_context())
@@ -299,6 +298,13 @@ class FileSnippetReader:
                         logger.error(f"Snippet file: {self.filepath}{Colors.ENDC}")
                         sys.exit(1)
                     end_line = lineno
+                    top_snip = stack[-1]
+                    if end_match.group(1).strip() != top_snip.name:
+                        logger.error(f"{Colors.RED}Error: line {lineno}: Found end snippet without start")
+                        logger.error(f"Snippet name: '{end_match.group(1)}'")
+                        logger.error(f"Previous snippet name: '{top_snip.name}'")
+                        logger.error(f"Snippet file: {self.filepath}{Colors.ENDC}")
+                        sys.exit(1)
                     snippets.append(stack.pop().withEndLine(end_line))
 
                 # self.print_context()
@@ -415,7 +421,7 @@ class FileSnippetReader:
                         print(Colors.error(
                             "Error: unmatched } at line "), self.clineno())
                         print(f"File: {self.filepath}")
-                        sys.exit(1)
+                        # sys.exit(1)
         if len(self.context_stack) > 0:
             self.last_context = self.context_stack[-1]
         return
@@ -424,6 +430,7 @@ class FileSnippetReader:
         """Current line is a multiline function declaration
         and ends with a ','. This function will consume
         next lines till ';' or '{' is found.
+        Returns if the function is a multiline function.
         """
         # to restore if we fail
         orig_i = self.i
@@ -529,7 +536,7 @@ def driver():
     if args.verbose:
         level = logging.INFO
     else:
-        level = logging.CRITICAL
+        level = logging.ERROR
     if args.dump_contexts:
         level = logging.DEBUG
     logging.basicConfig(level=level)
