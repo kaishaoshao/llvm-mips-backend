@@ -267,7 +267,7 @@
     "id": "cmake-reg-info",
     "filename": "llvm/lib/Target/Nova/CMakeLists.txt",
     "start_lineno": 21,
-    "end_lineno": 29,
+    "end_lineno": 30,
     "context_stack": [
       {
         "type": "NONE",
@@ -279,8 +279,8 @@
   {
     "id": "cmake-reg-info-cpp",
     "filename": "llvm/lib/Target/Nova/CMakeLists.txt",
-    "start_lineno": 33,
-    "end_lineno": 35,
+    "start_lineno": 34,
+    "end_lineno": 36,
     "context_stack": [
       {
         "type": "NONE",
@@ -292,8 +292,8 @@
   {
     "id": "cmake-mc-tdesc",
     "filename": "llvm/lib/Target/Nova/CMakeLists.txt",
-    "start_lineno": 36,
-    "end_lineno": 38,
+    "start_lineno": 37,
+    "end_lineno": 39,
     "context_stack": [
       {
         "type": "NONE",
@@ -305,8 +305,8 @@
   {
     "id": "cmake-subtarget",
     "filename": "llvm/lib/Target/Nova/CMakeLists.txt",
-    "start_lineno": 39,
-    "end_lineno": 41,
+    "start_lineno": 40,
+    "end_lineno": 42,
     "context_stack": [
       {
         "type": "NONE",
@@ -318,8 +318,8 @@
   {
     "id": "cmake-isel-lowering",
     "filename": "llvm/lib/Target/Nova/CMakeLists.txt",
-    "start_lineno": 42,
-    "end_lineno": 44,
+    "start_lineno": 43,
+    "end_lineno": 45,
     "context_stack": [
       {
         "type": "NONE",
@@ -358,7 +358,7 @@
     "id": "nova-instr-info-1",
     "filename": "llvm/lib/Target/Nova/NovaInstrInfo.td",
     "start_lineno": 1,
-    "end_lineno": 18,
+    "end_lineno": 37,
     "context_stack": [
       {
         "type": "NONE",
@@ -371,7 +371,7 @@
     "id": "nova-isel-lowering-cpp-1",
     "filename": "llvm/lib/Target/Nova/NovaIselLowering.cpp",
     "start_lineno": 1,
-    "end_lineno": 14,
+    "end_lineno": 15,
     "context_stack": [
       {
         "type": "NONE",
@@ -383,8 +383,8 @@
   {
     "id": "nova-isel-lowering-cpp-2",
     "filename": "llvm/lib/Target/Nova/NovaIselLowering.cpp",
-    "start_lineno": 16,
-    "end_lineno": 26,
+    "start_lineno": 17,
+    "end_lineno": 39,
     "context_stack": [
       {
         "type": "NONE",
@@ -397,7 +397,7 @@
     "id": "nova-isel-lowering-1",
     "filename": "llvm/lib/Target/Nova/NovaIselLowering.h",
     "start_lineno": 1,
-    "end_lineno": 47,
+    "end_lineno": 53,
     "context_stack": [
       {
         "type": "NONE",
@@ -410,7 +410,7 @@
     "id": "create-reginfo",
     "filename": "llvm/lib/Target/Nova/NovaMCTargetDesc.cpp",
     "start_lineno": 1,
-    "end_lineno": 24,
+    "end_lineno": 60,
     "context_stack": [
       {
         "type": "NONE",
@@ -423,7 +423,7 @@
     "id": "nova-mc-tdesc-1",
     "filename": "llvm/lib/Target/Nova/NovaMCTargetDesc.h",
     "start_lineno": 1,
-    "end_lineno": 14,
+    "end_lineno": 20,
     "context_stack": [
       {
         "type": "NONE",
@@ -436,7 +436,7 @@
     "id": "reginfo-cpp1",
     "filename": "llvm/lib/Target/Nova/NovaRegisterInfo.cpp",
     "start_lineno": 1,
-    "end_lineno": 16,
+    "end_lineno": 45,
     "context_stack": [
       {
         "type": "NONE",
@@ -579,7 +579,7 @@
     "id": "nova-subtarget-1",
     "filename": "llvm/lib/Target/Nova/NovaSubtarget.h",
     "start_lineno": 1,
-    "end_lineno": 51,
+    "end_lineno": 55,
     "context_stack": [
       {
         "type": "NONE",
@@ -644,7 +644,7 @@
     "id": "nova-target-info-tm",
     "filename": "llvm/lib/Target/Nova/NovaTargetMachine.cpp",
     "start_lineno": 37,
-    "end_lineno": 39,
+    "end_lineno": 41,
     "context_stack": [
       {
         "type": "NONE",
@@ -656,8 +656,8 @@
   {
     "id": "new-get-the-nova",
     "filename": "llvm/lib/Target/Nova/NovaTargetMachine.cpp",
-    "start_lineno": 46,
-    "end_lineno": 48,
+    "start_lineno": 51,
+    "end_lineno": 53,
     "context_stack": [
       {
         "type": "NONE",
@@ -665,6 +665,19 @@
       }
     ],
     "type": "replace=old-get-the-nova"
+  },
+  {
+    "id": "nova-target-machine-1",
+    "filename": "llvm/lib/Target/Nova/NovaTargetMachine.h",
+    "start_lineno": 1,
+    "end_lineno": 55,
+    "context_stack": [
+      {
+        "type": "NONE",
+        "line": 0
+      }
+    ],
+    "type": "add"
   },
   {
     "id": "reg.h-regs",
