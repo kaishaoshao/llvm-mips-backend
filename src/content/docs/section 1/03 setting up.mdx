@@ -2,6 +2,15 @@
 title: Setting up the Nova target
 description: Add the minimum required configuration code for the Nova target.
 ---
+
+import {Aside} from "@astrojs/starlight/components";
+
+<Aside title="Incomplete" type="caution">
+This section is incomplete and is in the works. It should only contain the minimum
+necessary code to be able to build LLVM for the Nova target.
+See [this commit](https://reviews.llvm.org/D88389) for reference.
+</Aside>
+
 Before we can start adding instructions, we need to set up some required configuration code.
 This contains the Nova subtarget, register and instruction information, frame and selection DAG
 lowering classes and a few others that set up the code generation pipeline.
@@ -9,4 +18,4 @@ lowering classes and a few others that set up the code generation pipeline.
 The code we add here will allow us to build LLVM for the Nova target but not to compile
 any LLVM IR to assembly code yet.
 
-## The Subtarget
+## Adding the NovaSubtarget

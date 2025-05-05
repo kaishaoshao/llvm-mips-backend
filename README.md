@@ -1,4 +1,4 @@
-# LLVM to MipsNova
+# LLVM to MIPS
 
 This repository contains the source for the tutorial series on writing a 
 backend for LLVM that compiles to MIPS Release 1 assembly.
