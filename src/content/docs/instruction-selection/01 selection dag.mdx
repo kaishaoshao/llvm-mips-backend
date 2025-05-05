@@ -1,0 +1,243 @@
+---
+title: Instruction selection with Selection DAG
+description: This describes the instruction selection process in the LLVM backend using Selection DAG.
+---
+import CodeSnippet from "../../../components/CodeSnippet.astro";
+import Details from "../../../components/Collapsible.astro";
+import { LinkCard, CardGrid, Aside } from "@astrojs/starlight/components";
+
+<Aside type="caution" title="Under construction">
+This page is under construction. This will contain information about the instruction selection process in LLVM.
+Details about how targets can configure the LLVM backend is on the next page.
+
+For now, read the following resources instead, then come back here to move on to the next page.
+
+<CardGrid>
+<LinkCard
+   href="https://llvm.org/docs/CodeGenerator.html#instruction-selection-section"
+   title="LLVM Instruction Selection docs"
+   target="_blank"
+/>
+<LinkCard
+   href="https://sourcecodeartisan.com/2020/11/17/llvm-backend-4.html"
+   title="Instruction Selection - Source Code Artisan"
+   target="_blank"
+/>
+{/* <LinkCard
+   href="https://eli.thegreenplace.net/2013/02/25/a-deeper-look-into-the-llvm-code-generator-part-1"
+   title="Eli Bendersky's blog post"
+   target="_blank"
+/> */}
+</CardGrid>
+</Aside>
+
+Once the frontend generates the LLVM IR, the compiler must convert it into machine instructions.
+
+We will take a look at how LLVM uses a tree pattern-matching algorithm for this and how a backend like
+Nova can configure LLVM to generate machine instructions.
+
+## Instruction Selection on DAGs
+Instruction selection is difficult because a processor provides different ways to perform the same operation.
+If we had exactly one way to perform a certain operation, the compiler would simply replace each IR line with the corresponding machine instruction.
+
+However, that is not the case. A simple reg to reg move instruction can be performed with addition, division, subtraction, multiplication, or a bitwise operation (with the other operand being the corresponding identity element).
+
+LLVM uses a tree pattern-matching structure called a Selection DAG to do this job.
+
+### A simple example
+A Selection DAG is a directed acyclic graph (DAG) where each node represents an operation or a value.
+In particular, the leaves of the DAG are constants or registers (virtual or physical) and other nodes represent operations 
+that return their result (which can be multiple).
+
+The selection process works on one basic block at a time. So every basic block is converted into a
+separate DAG, with no edges to the other basic blocks.
+
+Branch operation nodes take a basic block operand as an input, and the basic block is represented as a node in the DAG.
+
+import { Steps } from "@astrojs/starlight/components";
+
+Let's take this simple example.
+<Steps>
+<ol>
+<li>
+The compiler takes this code as input:
+```c
+int main(int a, int b) {
+  if (a + b == 0) {
+    return a - b;
+  }
+  return 0;
+}
+```
+</li>
+<li>
+The LLVM IR for this code is this (consider no optimizations):
+
+```c
+define i32 @main(i32 %a, i32 %b) {
+entry:
+  %add = add i32 %a, %b
+  %cmp = icmp eq i32 %add, 0
+  br i1 %cmp, label %true, label %false
+true:
+  %sub = sub i32 %a, %b
+  ret i32 %sub
+false:
+  ret i32 0
+}
+```
+</li>
+<li>
+import SelDagImage from "../../../assets/sel-dag-1.svg";
+import { Image } from "astro:assets";
+
+This is now converted into a DAG like so:
+<Image src={SelDagImage} alt="Selection DAG" width="500" loading="lazy" />
+
+Notice that there are two disconnected components in this DAG. The unconditional branch node
+`br` does not use any value from other nodes, so there is nothing to connect it to.
+
+> Other basic blocks are not shown here.
+
+</li>
+<li>
+After constructing the DAG, we need to lower it to machine instructions.
+In this example, the brcond and setcc is combined into a single branch with compare instruction.
+
+import SelectedDAGImg from "../../../assets/sel-dag-2.svg";
+
+<Image quality="max" src={SelectedDAGImg} alt="Selection DAG" width="500"  loading="lazy" />
+</li>
+</ol>
+</Steps>
+
+This completes the lowering phase of the selection. From here we schedule the instructions into a 
+linear sequence.
+
+## SelectionDAG in LLVM
+You might notice a problem with the above DAG. The unconditional branch is not connected 
+to the other nodes, so there is no way to know when to schedule it. (we certainly should not emit it before all other instructions!)
+
+To represent control flow dependencies like this, nodes return a special type of value called a
+chain. Further, if two nodes should be scheduled adjacent to each other, they use a Glue value.
+
+> Chains represent a dependency between nodes that can't be represented by a data dependency. For example a load following a store that might alias with the address of the load. The store must happen before the load. So the load's chain input is dependent on the store's chain output either directly or through other intermediate nodes that also have chain inputs and outputs. There can be multiple chains in parallel in the DAG. TokenFactor nodes are used to merge separate chains. The InstrEmitter ensures that the chain dependency is satisfied when emitting the linear instruction sequence after isel. But nothing guarantees that parallel chains won't be interleaved. After a node is schedule all of the nodes dependent on it either through data or chain are checked to see if they are now ready to schedule. The scheduler will pick from the ready to schedule nodes without any concern for whether they were on the same chain as the last node scheduled.
+>
+> Glue is stricter, it says that two nodes must be scheduled adjacent to each other in the linear instruction sequence.
+
+<LinkCard
+   href="https://groups.google.com/g/llvm-dev/c/F-GU_LiLOLs/m/CVETl5FwCQAJ"
+   title="Taken from: Glue and chains"
+/>
+
+#### Viewing the selection DAG output
+While compiling with `llc`, you can use these options to view the DAG output:
+
+- `-view-dag-combine1-dags` displays the DAG after being built, before the first optimization pass.
+- `-view-legalize-dags` displays the DAG before Legalization.
+- `-view-dag-combine2-dags` displays the DAG before the second optimization pass.
+- `-view-isel-dags` displays the DAG before the Select phase.
+- `-view-sched-dags` displays the DAG before Scheduling.
+
+<LinkCard
+   href="https://llvm.org/docs/CodeGenerator.html#instruction-selection-section"
+   title="Taken from: Viewing the Selection DAG"
+   target="_blank"
+/>
+
+## Selection stages
+Read about the stages of selection in the LLVM documentation and the post linked below.
+
+<LinkCard
+   href="https://sourcecodeartisan.com/2020/11/17/llvm-backend-4.html"
+   title="Instruction Selection - Source Code Artisan"
+   target="_blank"
+/>
+
+<Aside>
+Section to be written. For now the above resources are perhaps the best.
+</Aside>
+
+## Selection DAG in LLVM
+
+<Aside type="caution">
+The content below is still under construction, and is mostly based on the slides here:
+[A beginner's guide to SelectionDAG](https://llvm.org/devmtg/2024-10/slides/tutorial/MacLean-Fargnoli-ABeginnersGuide-to-SelectionDAG.pdf)
+
+</Aside>
+## Classes used
+Let's look at the classes in LLVM that represent the selection DAG.
+
+### MVT and EVT
+These two represent the types in LLVM.
+#### 1. MVT
+This is a union of all types that targets support in Selection DAG.
+<Details title="From the documentation">
+Machine Value Type. Every type that is supported natively by some
+processor targeted by LLVM occurs here. This means that any legal value
+type can be represented by an MVT.
+</Details>
+
+It is basically a single `uint16_t` value that is used to represent the type.
+We can see all types listed in `ValueTypes.td`.
+We can query the properties of the type using the `MVT` class methods.
+
+The types included in `MVT` are integers like i1, i32, floating point types like f32, bf16,
+vectors like v1i1, v1f16 and others like `Glue` and `Other`.
+Some of the types included in this are pasted here for reference:
+
+<CodeSnippet id="value-types-1" collapse="5-17"/>
+
+#### 2. EVT
+This extends the types include in the `MVT` set with types that the LLVM IR supports, like `i3` or `<4 x i5>`
+but may not be supported directly by a target.
+
+<Details title="From the documentation">
+Extended Value Type. Capable of holding value types which are not native
+for any processor (such as the i12345 type), as well as the types an MVT
+can represent.
+</Details>
+
+An EVT object holds an `MVT` value and an LLVM `Type` object.
+
+We can initialize an `EVT` object in two ways shown below. Note that they can be implicitly casted from `MVT`.
+<CodeSnippet noContext id="evt-init-1"/>
+{/* The two fields start off invalid for the default constructor. */}
+<CodeSnippet noContext id="evt-members"/>
+We then have a number of methods to query the type. Some of them are:
+1. `isSimple()` - Returns true if the type is a simple type (i.e. not a vector or complex type).
+Here "extended" means that this is not an MVT type but an LLVMTy.
+2. `isInteger()` - Returns true if the type is an integer type.
+and so on.
+
+<Details title="Viewing the DAG">
+Run `llc` with `-debug-only=isel` to see the selection DAG.
+
+```cpp
+Initial selection DAG: %bb.1 'main:true'
+SelectionDAG has 8 nodes:
+  t0: ch,glue = EntryToken
+      t2: i32,ch = CopyFromReg t0, Register:i32 %3
+      t4: i32,ch = CopyFromReg t0, Register:i32 %4
+    t5: i32 = sub t2, t4
+  t7: ch = CopyToReg t0, Register:i32 %1, t5
+```
+</Details>
+
+### SDNode
+These are the nodes in the selection DAG.
+
+Each node has an opcode, some flags, a list of operands and a list of result values.
+
+#### Opcodes
+Opcodes are represented by an int32_t value, but is taken from the `ISD` enum or 
+a target-specific `XXXISD` enum.
+
+We can query for the SDNode opcode with these methods:
+<CodeSnippet noContext id="sdnode-opcode"/>
+
+You can see all of the built-in opcodes in `ISDOpcodes.h`.
+
+
+{/* The main class is `SelectionDAG`. */}
+{/* <CodeSnippet id="sel-dag" noContext/> */}

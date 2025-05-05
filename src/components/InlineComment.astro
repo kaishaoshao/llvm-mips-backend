@@ -1,0 +1,84 @@
+---
+// This component renders the slot content (which should be only a text node)
+// and adds a dotted underline to it with an icon next to it.
+// When hovered, it shows the comment text in a tooltip.
+interface Props {
+  comment: string;
+  type?: 'note' | 'tip' | 'warning' | 'danger';
+}
+
+const { comment, type = 'note' } = Astro.props as Props;
+
+const icons = {
+  note: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M8 8.5v-4"/><path d="M8 11.5v-.5"/></svg>`,
+  tip: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1.5v1M12 4l.7-.7M4 4l-.7-.7M2.5 8h-1M14.5 8h-1M12 12l.7.7M4 12l-.7.7M8 14.5v1M10 8a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z"/></svg>`,
+  warning: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1 1 14h14L8 1ZM8 6v3M8 11.5v.5"/></svg>`,
+  danger: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="m10 6-4 4M6 6l4 4"/></svg>`
+};
+
+---
+
+<style>
+  .inline-comment {
+    position: relative;
+    display: inline-flex;
+    flex-direction: row;
+    cursor: help;
+    text-decoration: dotted underline;
+    align-items: center;
+    &:hover {
+      border: 1px solid yellow;
+    }
+    &>span {
+      margin-left: 5px;
+      svg {
+        width: 1.4rem;
+        height: 1.4rem;
+        fill: darkred;
+
+      }
+    }
+  }
+
+  .inline-comment::after {
+    content: attr(data-comment);
+    /* allow break word */
+    word-break: break-all;
+    width: max-content;
+    z-index: 2;
+    position: absolute;
+    top: -2rem;
+    left: 50%;
+    background-color: rgba(78, 17, 17, 0.85);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 1.4rem;
+    white-space: normal;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+    pointer-events: none;
+    /* media screen mobile */
+    @media (max-width: 600px) {
+      top: -3rem;
+      left: 0;
+      transform: translateX(0);
+      max-width: 100vw;
+      text-align: center;
+    }
+  }
+
+  .inline-comment:hover::after {
+    opacity: 1;
+  }
+  .inline-comment::before svg {
+    width: 16px;
+    height: 16px;
+    fill: var(--color-text);
+  }
+ </style>
+
+<div class="inline-comment" data-comment={comment} data-icon={icons[type]}>
+  <slot />
+  <span class="icon" set:html={icons[type]}></span>
+</div>

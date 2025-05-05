@@ -1,10 +1,12 @@
 ---
-title: "Section 1: Registering the target"
-description: In this section, we register the MipsNova target in LLVM
+title: "Section 1: Compiling a simple program"
+description: In this section, we write enough code to compile a simple program
 sidebar:
     order: 1
 ---
-## Registering the MipsNova target
 
-**Section 1** is about registering our target in llc
-so that we can use it in `llc`.
+**Section 1** is about writing the minimum required code to compile a simple program
+with a return statement with `llc -mtriple=mipsnova`.
+
+Right now, this backend uses the SelectionDAG to lower the LLVM IR.
+I plan to use the new GlobalISel framework in the future.

@@ -24,7 +24,7 @@ const colors = {
 const openAttr = defaultOpen ? {open: ''} : {};
 ---
 
-<details class={`details ${colors[type]}`} {...openAttr}>
+<details class={`details ${colors[type]}`} open={defaultOpen}>
   <summary class="details-summary">
     <span class="icon" set:html={icons[type]} />
     <span class="title">{title}</span>

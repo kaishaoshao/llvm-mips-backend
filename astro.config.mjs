@@ -8,7 +8,6 @@ import tailwindcss from '@tailwindcss/vite';
 // https://astro.build/config
 export default defineConfig({
   site: "https://optimisan.github.io/",
-  base: "llvm-mips-backend",
   integrations: [
       {
           name: "create-snippets-json",
@@ -41,11 +40,15 @@ export default defineConfig({
               // 	],
               // },
               {
-                  label: 'Background',
+                  label: 'About',
                   autogenerate: { directory: 'background' },
               },
               {
-                  label: "Section 1",
+                label: 'Instruction Selection',
+                autogenerate: { directory: 'instruction-selection' },
+              },
+              {
+                  label: "1. Minimal Compilation",
                   autogenerate: {directory: "section 1"}
               },
               {

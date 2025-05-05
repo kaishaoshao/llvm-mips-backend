@@ -1,0 +1,12 @@
+---
+title: Setting up the Nova target
+description: Add the minimum required configuration code for the Nova target.
+---
+Before we can start adding instructions, we need to set up some required configuration code.
+This contains the Nova subtarget, register and instruction information, frame and selection DAG
+lowering classes and a few others that set up the code generation pipeline.
+
+The code we add here will allow us to build LLVM for the Nova target but not to compile
+any LLVM IR to assembly code yet.
+
+## The Subtarget
