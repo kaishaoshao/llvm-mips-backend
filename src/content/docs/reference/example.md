@@ -5,6 +5,8 @@ description: Talks, blogs, slides on LLVM backend structures.
 
 https://llvm.org/devmtg/2024-10/slides/tutorial/MacLean-Fargnoli-ABeginnersGuide-to-SelectionDAG.pdf
 
+More references should be added here. They must be for beginners and relevant to writing backends only.
+
 <!-- Reference pages are ideal for outlining how things work in terse and clear terms.
 Less concerned with telling a story or addressing a specific use case, they should give a comprehensive outline of what you're documenting.
 

@@ -7,13 +7,13 @@ hero:
   # image:
   #   file: ../../assets/houston.webp
   actions:
-    - text: Get started
+    - text: Let's start building!
       link: /background/
       icon: right-arrow
-    - text: Read LLVM
-      link: https://starlight.astro.build
+    - text: Read about LLVM
+      link: https://llvm.org/
       icon: external
-      variant: minimal
+      variant: secondary
 ---
 
 import { Card, CardGrid } from "@astrojs/starlight/components";
@@ -30,11 +30,15 @@ import BlurCard from "../../components/BlurCard.astro";
 
 <BlurCard title="MIPS Architecture" icon="seti:asm">
   {/* ### 2. MIPS Architecture Deep Dive Explore the MIPS instruction set */}
-  MIPS architecture, register file organization, calling conventions, and special
-  hardware features that influence backend implementation.
+  Learn the MIPS architecture, including its instruction set and calling conventions.
 </BlurCard>
 
-<Card>
+<BlurCard title="Build your first backend" icon="seti:code-climate">
+  Build your first LLVM backend in a weekend! Find every step lucidly explained in the pages that follow.
+</BlurCard>
+
+{/* <BlurCard title=""> */}
+{/* <Card>
   ### 3. Instruction Selection Master the process of translating LLVM IR to MIPS
   assembly, including pattern matching, custom TableGen patterns, and
   optimization opportunities specific to MIPS.
@@ -71,15 +75,13 @@ import BlurCard from "../../components/BlurCard.astro";
   development.
 </Card>
 
-<div className="custom-card">
-  {/* <Card > */}
+  <Card >
     ### 8. Performance Tuning
     Fine-tune the backend for optimal performance, including instruction selection patterns, scheduling policies, and target-specific optimizations.
-  {/* </Card> */}
-  </div>
+  </Card> */}
 </CardGrid>
 </div>
-
+{/* 
 <CardGrid stagger>
   <Card title="Update content" icon="pencil">
     Edit `src/content/docs/index.mdx` to see this page change.
@@ -93,4 +95,4 @@ import BlurCard from "../../components/BlurCard.astro";
   <Card title="Read the docs" icon="open-book">
     Learn more in [the Starlight Docs](https://starlight.astro.build/).
   </Card>
-</CardGrid>
+</CardGrid> */}

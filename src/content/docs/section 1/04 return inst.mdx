@@ -1,6 +1,8 @@
 ---
 title: "The Return Instruction"
 description: Here we add the return instruction for the Nova target.
+sidebar:
+  order: 5
 ---
 import InlineComment from "../../../components/InlineComment.astro";
 import CodeSnippet from "../../../components/CodeSnippet.astro";
@@ -18,26 +20,18 @@ some tablegen and C++ code. Here is what we have to do:
 
 1. Write instructions in `NovaInstrInfo.td`. These should cover all
 instructions we want to support from the MIPS ISA.
-2. Normally you want to add instruction encodings, but we don't need encodings for compiling to assembly. We just move to the next step.
-3. Write matching patterns in `NovaInstrPats.td` and `NovaISelDAGToDAG.cpp`. This is where we will
-   implement the instruction selection.
+> Normally you want to add instruction encodings in 1, but we don't need encodings for compiling to assembly. We just move to the next step.
+2. Write matching patterns in `NovaInstrPats.td`. This is where we implement the instruction selection.
+3. Write the `NovaISelLowering.cpp` file to lower LLVM code to the target-specific SelectionDAG nodes.
 4. Write the `NovaISelDAGToDAG.cpp` file to implement the instruction selection.
-5. Write the `NovaISelLowering.cpp` file to implement the instruction lowering.
 
 You'll know what each step means when we get to it.
 
 ## Instruction Selection
 <Details title="Explain how selection works">
-LLVM uses a two-phase process to select instructions. The first phase is called "instruction selection" and the second phase is called "instruction lowering".
+> Remove this section and just link to the previous Instruction Selection pages.
 
-The instruction selection phase is responsible for selecting the appropriate instructions from the target's instruction set architecture (ISA) to implement the operations in the LLVM IR. This is done by matching the LLVM IR operations to the target's instructions using a set of patterns.
-
-The instruction lowering phase is responsible for converting the selected instructions into a form that can be executed by the target's hardware. This may involve generating machine code, or it may involve generating intermediate code that can be further optimized before being converted to machine code.
-
-
-The instruction selection phase is done using a set of patterns that are defined in the `XXXISelDAGToDAG.cpp` file. These patterns are used to match the LLVM IR operations to the target's instructions. The instruction lowering phase is done using a set of patterns that are defined in the `XXXISelLowering.cpp` file. These patterns are used to convert the selected instructions into a form that can be executed by the target's hardware.
-
-The instruction lowering phase is done using a set of patterns that are defined in the `XXXISelLowering.cpp` file. These patterns are used to convert the selected instructions into a form that can be executed by the target's hardware.
+LLVM uses a two-phase process to select instructions.
 
 Most of the time, TableGen will generate the patterns for you.
 
