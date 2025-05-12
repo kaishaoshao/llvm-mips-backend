@@ -251,13 +251,15 @@ pattern ::=  '(' PatternOperator ')' // only operator, no arguments
 PatternOperator ::= 'null_frag'
                     | TypeCastOperator
                     | SDNodeOperator
-                    | recordOfType( PatFrags
-                                    | Instruction | SDNodeXForm // both can be in output patterns only
-                                    | Intrinsic // in input patterns only
-                                    | ComplexPattern
-                                  )
-                    | 'set' // can only be used in instruction inline patterns
-                    | 'ops' | 'ins' | 'outs' // only for pattern fragment operators 
+                    | recordOfType(
+                            PatFrags
+                            | Instruction // in output patterns only
+                            | SDNodeXForm // in output patterns only
+                            | Intrinsic // in input patterns only
+                            | ComplexPattern
+                          )
+                  | 'set' // can only be used in instruction inline patterns
+                  | 'ops' | 'ins' | 'outs' // only for pattern fragment operators 
 
 SDNodeOperator ::= OutputSDNodeOperator // for output patterns only
                    | InputSDNodeOperator // for input patterns only
@@ -265,12 +267,15 @@ SDNodeOperator ::= OutputSDNodeOperator // for output patterns only
 OutputSDNodeOperator ::= 'imm' | 'timm' | 'fpimm' | 'tglobaltlsaddr'
                     | 'tglobaladdr' | 'tblockaddress' | 'texternalsym'
                     | 'tconstpool' | 'tjumptable' | 'tframeindex'
-                    | 'bb' | 'vt' | 'mcsym' // no other nodes cannot be emitted in the DAG
+                    | 'bb' | 'vt' | 'mcsym'
+                         // no other SDNodes' can be emitted in the DAG
 
 InputSDNodeOperator ::= recordOfType(SDNode) // like (add imm:$immediate, ...)
+                                            // any SDNode can be used here
 
-TypeCastOperator ::= TGTypes::List<recordOfType(ValueType)> // for intrinsics returning multiple values
-                                                        // like ([i16, i32] (intrinsic_with_two_ret_values ...))
+TypeCastOperator ::= TGTypes::List<recordOfType(ValueType)>
+                               // for intrinsics returning multiple values
+                               // like ([i16, i32] (intrinsic_with_two_ret_values ...))
                     | recordOfType(ValueType) // single ret value type cast
                                              // like (i16 (op_ret_one_val ...))
 
@@ -278,11 +283,13 @@ ArgList ::= PatternArg ( ',' PatternArg )* // comma separated list of arguments
 
 PatternArg ::= PatternArgVal ArgName? // argument can have an optional name
             | '$' name // no value
+            | 'node' ArgName // special record to indicate an input argument
+                             // for PatFrag operands only
             | instanceOfType(TGTypes::Int) // int value, to match or emit constants
             | instanceOfType(TGTypes::Bit) // converted to an int value
             | instanceOfType(TGTypes::Bits) ArgName?
-                                           // converted to an int value
-                                           // all are emitted as TargetConstant nodes.
+                                      // Bits is also converted to an int value
+                                      // and emitted as TargetConstant node.
 
 ArgName ::= ':' '$' identifier
 
@@ -291,8 +298,6 @@ PatternArgVal ::= pattern // note: (add imm:$imm) is the same as (add (imm):$imm
                 | SDNodeOperator // like 'imm' in (add imm:$immediate, ...)
                                 // this is wrapped into its own dag: imm:$name -> (imm):$name
                 | recordOfType(PatFrags) // this is wrapped similarly
-                | 'node' // special record to indicate an input argument
-                         // for a PatFrag
 ```
 
 ### Using patterns
