@@ -338,31 +338,18 @@
   {
     "id": "cmake-reg-info",
     "filename": "llvm/lib/Target/Nova/CMakeLists.txt",
-    "start_lineno": 24,
-    "end_lineno": 26,
+    "start_lineno": 18,
+    "end_lineno": 21,
     "context_stack": [
       {
         "type": "NONE",
         "line": 0
       }
     ],
-    "type": "end"
+    "type": "commented"
   },
   {
     "id": "cmake-subtarget-info",
-    "filename": "llvm/lib/Target/Nova/CMakeLists.txt",
-    "start_lineno": 27,
-    "end_lineno": 29,
-    "context_stack": [
-      {
-        "type": "NONE",
-        "line": 0
-      }
-    ],
-    "type": "end"
-  },
-  {
-    "id": "cmake-instr-info",
     "filename": "llvm/lib/Target/Nova/CMakeLists.txt",
     "start_lineno": 30,
     "end_lineno": 32,
@@ -375,7 +362,7 @@
     "type": "end"
   },
   {
-    "id": "cmake-dag-isel",
+    "id": "cmake-instr-info",
     "filename": "llvm/lib/Target/Nova/CMakeLists.txt",
     "start_lineno": 33,
     "end_lineno": 35,
@@ -388,7 +375,7 @@
     "type": "end"
   },
   {
-    "id": "cmake-asm-writer",
+    "id": "cmake-dag-isel",
     "filename": "llvm/lib/Target/Nova/CMakeLists.txt",
     "start_lineno": 36,
     "end_lineno": 38,
@@ -401,10 +388,23 @@
     "type": "end"
   },
   {
+    "id": "cmake-asm-writer",
+    "filename": "llvm/lib/Target/Nova/CMakeLists.txt",
+    "start_lineno": 39,
+    "end_lineno": 41,
+    "context_stack": [
+      {
+        "type": "NONE",
+        "line": 0
+      }
+    ],
+    "type": "end"
+  },
+  {
     "id": "nova-cmake",
     "filename": "llvm/lib/Target/Nova/CMakeLists.txt",
-    "start_lineno": 21,
-    "end_lineno": 40,
+    "start_lineno": 25,
+    "end_lineno": 44,
     "context_stack": [
       {
         "type": "NONE",
@@ -416,8 +416,8 @@
   {
     "id": "cmake-reg-info-cpp",
     "filename": "llvm/lib/Target/Nova/CMakeLists.txt",
-    "start_lineno": 44,
-    "end_lineno": 46,
+    "start_lineno": 48,
+    "end_lineno": 50,
     "context_stack": [
       {
         "type": "NONE",
@@ -429,8 +429,8 @@
   {
     "id": "cmake-mc-tdesc",
     "filename": "llvm/lib/Target/Nova/CMakeLists.txt",
-    "start_lineno": 47,
-    "end_lineno": 49,
+    "start_lineno": 51,
+    "end_lineno": 53,
     "context_stack": [
       {
         "type": "NONE",
@@ -442,8 +442,8 @@
   {
     "id": "cmake-setting-up",
     "filename": "llvm/lib/Target/Nova/CMakeLists.txt",
-    "start_lineno": 50,
-    "end_lineno": 54,
+    "start_lineno": 54,
+    "end_lineno": 58,
     "context_stack": [
       {
         "type": "NONE",
@@ -455,8 +455,8 @@
   {
     "id": "cmake-instr-info",
     "filename": "llvm/lib/Target/Nova/CMakeLists.txt",
-    "start_lineno": 55,
-    "end_lineno": 57,
+    "start_lineno": 59,
+    "end_lineno": 61,
     "context_stack": [
       {
         "type": "NONE",
@@ -468,8 +468,8 @@
   {
     "id": "cmake-isel-lowering",
     "filename": "llvm/lib/Target/Nova/CMakeLists.txt",
-    "start_lineno": 58,
-    "end_lineno": 60,
+    "start_lineno": 62,
+    "end_lineno": 64,
     "context_stack": [
       {
         "type": "NONE",
@@ -481,8 +481,8 @@
   {
     "id": "cmake-isel-dag",
     "filename": "llvm/lib/Target/Nova/CMakeLists.txt",
-    "start_lineno": 61,
-    "end_lineno": 63,
+    "start_lineno": 65,
+    "end_lineno": 67,
     "context_stack": [
       {
         "type": "NONE",
@@ -494,8 +494,8 @@
   {
     "id": "cmake-inst",
     "filename": "llvm/lib/Target/Nova/CMakeLists.txt",
-    "start_lineno": 64,
-    "end_lineno": 66,
+    "start_lineno": 68,
+    "end_lineno": 70,
     "context_stack": [
       {
         "type": "NONE",
@@ -507,8 +507,8 @@
   {
     "id": "cmake-asm-printer",
     "filename": "llvm/lib/Target/Nova/CMakeLists.txt",
-    "start_lineno": 67,
-    "end_lineno": 69,
+    "start_lineno": 71,
+    "end_lineno": 73,
     "context_stack": [
       {
         "type": "NONE",
@@ -560,7 +560,7 @@
     "id": "nova-inst-printer-2",
     "filename": "llvm/lib/Target/Nova/MCTargetDesc/NovaMCInstPrinter.cpp",
     "start_lineno": 13,
-    "end_lineno": 22,
+    "end_lineno": 23,
     "context_stack": [
       {
         "type": "NONE",
@@ -572,8 +572,8 @@
   {
     "id": "nova-inst-printer-3",
     "filename": "llvm/lib/Target/Nova/MCTargetDesc/NovaMCInstPrinter.cpp",
-    "start_lineno": 24,
-    "end_lineno": 28,
+    "start_lineno": 25,
+    "end_lineno": 29,
     "context_stack": [
       {
         "type": "NONE",
@@ -585,12 +585,12 @@
   {
     "id": "nova-inst-printer-4",
     "filename": "llvm/lib/Target/Nova/MCTargetDesc/NovaMCInstPrinter.cpp",
-    "start_lineno": 30,
-    "end_lineno": 47,
+    "start_lineno": 31,
+    "end_lineno": 48,
     "context_stack": [
       {
         "type": "AFTER",
-        "line": 25
+        "line": 26
       }
     ],
     "type": "add"

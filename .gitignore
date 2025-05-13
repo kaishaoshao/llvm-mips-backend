@@ -27,3 +27,4 @@ me_lua/
 # build/ includes all folders named
 # "build" anywhere in the project
 build/
+public/google*

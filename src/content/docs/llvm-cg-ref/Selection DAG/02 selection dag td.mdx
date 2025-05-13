@@ -33,6 +33,8 @@ All content in this page can be found in the `Target.td` and `TargetSelectionDAG
 Types are given in `ValueTypes.td` and properties in `SDNodeProperties.td`.
 
 For builtin SDNode opcodes, refer to the `ISDOpcodes.h` file.
+I recommend you to look at these files while reading this page and also
+to read any target's `XXXInstrInfo.td` file to see how they use the TableGen.
 </Aside>
 
 ## Registers 
@@ -141,7 +143,7 @@ To use these classes, we create anonymous records in the type profile.
 To create a type profile, define a record that subclasses the `SDTypeProfile` class.
 
 Here is an example:
-```c
+```cpp
 // SDTCisFP - The specified operand has floating-point type.
 class SDTCisFP<int OpNum> : SDTypeConstraint<OpNum>;
 
@@ -305,28 +307,45 @@ PatternArgVal ::= pattern // note: (add imm:$imm) is the same as (add (imm):$imm
 Using patterns is quite simple. Use the `Pat` class to create a pattern.
 You don't have to name the pattern record.
 
-```cpp
+```jsx
 def : Pat<(add i32:$src1, i32:$src2)),
                 (ADDiu i32:$src1, i32:$src2)>;
 ```
 
 ### PatFrags
 Pattern fragments are like macros for patterns. They can be used as an operator in other
-patterns or other pattern fragments. These are to de-duplicate common patterns.
+patterns or other pattern fragments. These get expanded at the use site into their
+corresponding output patterns.
 
-```cpp title="Example"
+```jsx title="PatFrag Example"
 def not_pat_frag : PatFrag<(ops node:$in), (xor node:$in, -1)>;
 ```
 
+{/* You can use multiple output patterns using the `PatFrags` class.
+```jsx title="PatFrag with multiple outputs"
+def not_pat_frag : PatFrag<(ops node:$in), [(xor node:$in, -1), (add node:$in, 1)]>;
+``` */}
+
 #### Syntax
-```cpp
+```jsx title="PatFrag syntax"
 def {pat_frag_name} : PatFrags<(ops { node:$nameN }*), [ {output patternN}* ]>
 ```
 
 The 'input' of a pattern fragment is the `(ops node, ...)` pattern. The output pattern
 `(xor node:$in, -1)` is what gets inlined at the use of this pattern fragment.
 
-`node` is a special record that can only be used for the pattern fragment input operands.
+<Details title="`ops`, `ins`, `outs`, `node`, `set`" defaultOpen>
+All these are "keywords" in the ISel TableGen language.
+> "keywords" mean just special records that have a hardcoded meaning in the TableGen backend.
+
+- `ops`, `ins` and `outs` are all equivalent nodes used only in input patterns for fragments and inline
+patterns in instructions.
+   - `ins` is mostly used for input operand pattern of an instruction and `outs` for the output.
+   - `ops` is mostly used in pattern fragments.
+- `set` is a special operator that can be only used in instruction's inline patterns.
+- `node` can be only used in the input pattern of a pattern fragment.
+
+</Details>
 
 ```cpp title="Using the patfrag" "not_pat_frag" "(xor i16:$in, -1)"
 def : Pat<(not_pat_frag i16:$in), (NotInstr i16:$in)>;
@@ -391,9 +410,9 @@ def : Pat<(store (i32 0), addr:$dst),
 // addr = a complex pattern for a MIPS addressing mode.
 ```
 
-<Aside type="caution" title="Under construction">
+{/* <Aside type="caution" title="Under construction">
 More examples and details on patfrags and patterns are still in the works.
-</Aside>
+</Aside> */}
 
 ### Type inference
 The input pattern (in a `Pat` definition) must resolve to a single type.
