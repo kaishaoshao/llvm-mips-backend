@@ -2,9 +2,9 @@
 title: "TableGen for instruction selection"
 description: "Configuring the target for isel"
 ---
-import CodeSnippet from "../../../components/CodeSnippet.astro";
-import Details from "../../../components/Collapsible.astro";
-import InlineComment from "../../../components/InlineComment.astro";
+import CodeSnippet from "@/components/CodeSnippet.astro";
+import Details from "@/components/Collapsible.astro";
+import InlineComment from "@/components/InlineComment.astro";
 import { LinkCard, CardGrid, Aside } from "@astrojs/starlight/components";
 import { Code } from "@astrojs/starlight/components";
 
@@ -21,11 +21,11 @@ Essentially, we specify instructions and rules on how to match SDNodes to our in
 by using TableGen records. Then, the instruction selection TableGen backend generates the 
 necessary code to actually perform the selection.
 
-<Aside>
+<Details title="This page can be updated" type="note">
 This page is a work in progress. The intention is to provide a comprehensive documentation on how
 to use TableGen for instruction selection.
-The documentation is not complete yet, but we will be adding more information soon.
-</Aside>
+The documentation is not upto what I have in mind, but I'll be adding more details soon.
+</Details>
 
 <Aside type="tip">
 All content in this page can be found in the `Target.td` and `TargetSelectionDAG.td` files.
@@ -314,17 +314,23 @@ def : Pat<(add i32:$src1, i32:$src2)),
 Pattern fragments are like macros for patterns. They can be used as an operator in other
 patterns or other pattern fragments. These are to de-duplicate common patterns.
 
-```cpp
+```cpp title="Example"
 def not_pat_frag : PatFrag<(ops node:$in), (xor node:$in, -1)>;
 ```
+
+#### Syntax
+```cpp
+def {pat_frag_name} : PatFrags<(ops { node:$nameN }*), [ {output patternN}* ]>
+```
+
 The 'input' of a pattern fragment is the `(ops node, ...)` pattern. The output pattern
 `(xor node:$in, -1)` is what gets inlined at the use of this pattern fragment.
 
-`node` is a special record that can only be used in pattern fragments.
+`node` is a special record that can only be used for the pattern fragment input operands.
 
-```cpp title="Using the patfrag"
-def : Pat<(not i16:$in), (NotInstr i16:$in)>;
-// This will be inlined to:
+```cpp title="Using the patfrag" "not_pat_frag" "(xor i16:$in, -1)"
+def : Pat<(not_pat_frag i16:$in), (NotInstr i16:$in)>;
+// not_pat_frag gets expanded to:
 def : Pat<(xor i16:$in, -1), (NotInstr i16:$in)>;
 ```
 The labels like `$in` cannot be used more than once in the same pattern fragment.

@@ -6,6 +6,8 @@ sidebar:
 ---
 
 import {Aside} from "@astrojs/starlight/components";
+import CodeSnippet from "../../../components/CodeSnippet.astro";
+
 
 <Aside title="Incomplete" type="caution">
 This section is incomplete and is in the works. It should only contain the minimum
@@ -21,3 +23,99 @@ The code we add here will allow us to build LLVM for the Nova target but not to 
 any LLVM IR to assembly code yet.
 
 ## Adding the NovaSubtarget
+TableGen generates the `NovaGenSubtarget` class. Add the tablegen invocation to
+CMakeLists.txt:
+
+<CodeSnippet id="cmake-subtarget-info"/>
+
+Whip up a new header file for the subtarget class in `lib/Target/Nova`. Here we
+include the generated subtarget file from TableGen.
+
+The Subtarget is the central place from where we access the target information 
+per function. We will include some header files that we will create later on.
+<CodeSnippet id="nova-subtarget-1"/>
+
+Add the fields for all info classes. These will be created ahead.
+<CodeSnippet id="nova-subtarget-2"/>
+
+Add the corresponding getters and the constructor, ending the file.
+<CodeSnippet id="nova-subtarget-3"/>
+
+### Global functions
+Targets have a few global functions to define or create codegen passes which 
+are consolidated in one header file. Create the `Nova.h` file for our target.
+This is empty for now.
+
+<CodeSnippet id="nova-h-old"/>
+
+The definitions need to be added to the implementation file.
+<CodeSnippet id="nova-subtarget-cpp"/>
+
+### Registering the subtarget
+Include the generated file in `NovaMCTargetDesc` files.
+<CodeSnippet id="nova-get-subtargetinfo"/>
+
+<CodeSnippet id="nova-get-subtargetinfo-h"/>
+
+This needs the definition of the `MCSubtargetInfo` class which is the base.
+<CodeSnippet id="include-mcsubtarget-info"/>
+
+We need to register the subtarget in `NovaTargetMachine.cpp` as well.
+<CodeSnippet id="nova-create-subtarget"/>
+<CodeSnippet id="nova-register-subtarget"/>
+
+
+## MCTargetDesc
+The common place for the target descriptions is the `NovaMCTargetDesc.h` file.
+This has the instruction set, register info and subtarget information.
+
+We already created this file in the registers section.
+
+## TargetObjectFile
+Another class that is required but unused is `NovaTargetObjectFile`.
+
+<CodeSnippet id="nova-target-object-file.h"/>
+Write the `Initialize` definition.
+<CodeSnippet id="nova-target-object-file.cpp"/>
+
+## TargetMachine
+The `TargetMachine` class is the main entry point for the target. It contains
+the codegeneration pipeline and other target information.
+<CodeSnippet id="nova-target-machine-1"/>
+
+Add the class declaration.
+<CodeSnippet id="nova-target-machine-2"/>
+
+`createPassConfig` will be added in the next section.
+<Aside title="Pass Manager">
+The pass manager infrastructure is what runs passes over the IR.
+Till now, the code generation pipeline (what `llc` does) was
+using the legacy pass manager. But very soon it will be deprecated
+and we'll switch to the new pass manager. (I'm one of the people
+working on it).
+
+I'll update this guide when that happens.
+</Aside>
+
+## ASMInfo
+The `MCAsmInfo` class holds the information about the assembly language for the target.
+<CodeSnippet id="nova-mc-asm.h"/>
+I am adding the minimum possible stuff to get us running, but you can
+explore all the fields in the class and customize it here.
+<CodeSnippet id="nova-mc-asm.cpp"/>
+
+Like with other target info classes, we need to register the `MCAsmInfo` class
+in the `NovaMCTargetDesc` file. This is done in the `Initialize` function.
+
+Include the headers.
+<CodeSnippet id="include-mc-asm-info"/>
+
+Ready the MCAsmInfo instance.
+<CodeSnippet id="nova-create-asm-info"/>
+Place it into the Target.
+<CodeSnippet id="register-asm-info"/>
+
+
+Lastly, don't forget to add the source files to CMakeLists.txt.
+<CodeSnippet id="cmake-setting-up"/>
+With this, we are set to implement instructions.

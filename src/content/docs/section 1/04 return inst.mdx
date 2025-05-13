@@ -41,7 +41,6 @@ Lowering phase is: Target-specific SelectionDAG --optimize, then lower--> Target
 
 </Details>
 
-## Adding the Return Instruction
 To define Nova's instructions, we need to write entries for each instruction as a TableGen record that
 is an instance of the `Instruction` class. This is done in the `NovaInstrInfo.td` file.
 
@@ -98,106 +97,52 @@ All target tablegen files are included in the top-level `XXX.td` file.
 Include the new `NovaInstrInfo.td` file in `Nova.td`:
 <CodeSnippet id="nova-instr-info-td-include"/>
 
+### InstrInfo class
+TableGen'erated instruction records are stored in the `NovaInstrInfo` class.
+Following the common tablegen pattern, we derive our class from the 
+`NovaGenInstrInfo` class.
+
+<CodeSnippet id="nova-instr-info.h"/>
+
+Before we create the constructor, we need stack manipulation instructions.
+
+> These instructions and the `callseq_end` SDNode are just placeholders for now.
+> We will use them while lowering call nodes.
+
+<CodeSnippet id="nova-adj-stack-td"/>
+
+Create the `NovaInstrInfo.cpp` file and implement the constructor.
+<CodeSnippet id="nova-instr-info.cpp"/>
+
+Include this in `CMakeLists.txt` to build the file.
+<CodeSnippet id="cmake-instr-info" beforeContext={5}/>
+
+// Add the GenInstrInfo.inc include to MCTargetDesc files.
+### Registering the InstrInfo
+Instructions are represented by enum objects, and individual information is in `MCInstrDesc` objects.
+
+Include the enum declaration in the `MCTargetDesc` header file.
+<CodeSnippet id="nova-get-instrinfo-h"/>
+TableGen generates all instructions in a `MSInstrDesc[]` array.
+<CodeSnippet id="nova-get-instrinfo"/>
+
+We should now also include the necessary files for the definitions.
+<CodeSnippet id="include-mc-instrinfo"/>
+
+Register the instruction info in the `createNovaMCInstrInfo` function.
+<CodeSnippet id="register-instrinfo"/>
+<CodeSnippet id="register-instrinfo-2"/>
+
 With this, we have defined everything required to support the return instruction.
 
-### Lowering to SelectionDAG
+## Lowering to SelectionDAG
 We have to tell the `SelectionDAGBuilder` how to lower the LLVM IR `ret` instruction to Nova's SDNodes.
 
-More specifically, we have to construct physical register nodes for the return values and insert the actual return SDNode. This is done in the `LowerReturn` method of the `TargetLowering` class.
-
-Spin up the `NovaISelLowering.cpp` file.
-<CodeSnippet id="nova-isel-lowering-cpp-init"/>
-
-We have to declare legal types for the target. This is done in the `NovaTargetLowering` constructor.
-<CodeSnippet id="nova-isel-lowering-cpp-1"/>
-
-Now implement the `LowerReturn` method.
-<CodeSnippet id="nova-isel-lowering-ret-lower-1"/>
-
-The `Outs` vector contains the 
-
-## Jump and Branch Instructions
-
-First we need to create our TargetLowering class to tell
-LLVM how to select instructions.
-
-{/* <CodeSnippet id="nova-isel-lowering-1"/> */}
-
-Add the instructions in the td file.
-
-{/* <CodeSnippet id="nova-instr-info-1"/> */}
-
-{/* <Details title="Glue and chains">
-<LinkCard
-   href="https://groups.google.com/g/llvm-dev/c/F-GU_LiLOLs/m/CVETl5FwCQAJ"
-   title="LLVM: Glue and chains"
-   />
-> Chains represent a dependency between nodes that can't be represented by a data dependency. For example a load following a store that might alias with the address of the load. The store must happen before the load. So the load's chain input is dependent on the store's chain output either directly or through other intermediate nodes that also have chain inputs and outputs. There can be multiple chains in parallel in the DAG. TokenFactor nodes are used to merge separate chains. The InstrEmitter ensures that the chain dependency is satisfied when emitting the linear instruction sequence after isel. But nothing guarantees that parallel chains won't be interleaved. After a node is schedule all of the nodes dependent on it either through data or chain are checked to see if they are now ready to schedule. The scheduler will pick from the ready to schedule nodes without any concern for whether they were on the same chain as the last node scheduled.
->
-> Glue is stricter, it says that two nodes must be scheduled adjacent to each other in the linear instruction sequence.
-
-</Details> */}
-
-We now have to tell LLVM how to lower return instructions. This is done in the `TargetLowering` class.
-
-<Details title="See the virtual method in TargetLowering">
-This method must be implemented by targets.
+More specifically, we have to construct physical register nodes for the return values and insert the actual return SDNode.
+This is done in the `LowerReturn` method of the `TargetLowering` class.
 
 
-{/* <CodeSnippet noContext id="the-lower-return"/> */}
 
-</Details>
-
-But first, let's see how target calling conventions are defined.
-
-Here are some types that are used for calling-convention information.
-
-#### 1. `ISD::ArgFlagsTy`
-This is a bitset that contains information about the argument. It is used to
-   determine how the argument should be passed to the function.
-<Details title="ISD::ArgFlagsTy">
-<CodeSnippet noContext id="arg-flags"/>
-</Details>
-
-#### 2. `ISD::InputArg`
-This struct contains the flags and type information about a single incoming (formal) argument or incoming return value virtual register.
-
-<CodeSnippet noContext id="input-arg"/>
-
-#### 3. `ISD::OutputArg`
-Same as `ISD::InputArg`, but for outgoing arguments. It is used to determine how the argument should be passed to the function.
-<CodeSnippet noContext id="output-arg"/>
-
-
-The next major structure is the `SelectionDAG` that is passed to the `LowerReturn` method. Let's take a look at that.
-
-## `SelectionDAG`
-<Details title="Move this section" type="tip">
-This can be moved into its own page explaining the selection process.
-</Details>
-Each SDAG represents a single basic block in a function. In the instruction selection pipeline,
-the DAG is constructed from the LLVM IR. Then the DAG is transformed into a target-specific DAG.
-
-DAG is defined by the root and entry node.
-
-// write about printing and reading the dag.
-
-### Calling Conventions
-LLVM defines a number of common calling conventions, represented by the `CallingConv::ID` as an enum value.
-
-Some of them are `C`, `Fast`, `Cold` and some target-specific ones like `Win64` and `X86_64_SysV`. 
-
-**CCValAssign**
-This represents assignment of one arg/retval to a location.
-
-Let's now implement the `LowerReturn` method in our `TargetLowering` class.
-
-Setup the ISel Lowering file.
-{/* <CodeSnippet id="nova-isel-lowering-1"/> */}
-Write the implementation.
-{/* <CodeSnippet id="nova-isel-lowering-cpp-1"/> */}
-
-Now onto the LowerReturn method.
 
 Let's consider an example of a return statement that needs to be lowered.
 
@@ -230,11 +175,268 @@ We see that the return instruction returns two values for one i64 value. This is
 
 The `LowerReturn` method is responsible for lowering the return instruction. It does this by iterating over the return values and creating a new `SDNode` for each value. The `SDNode` is then added to the DAG.
 
+<Details title="See the virtual method in TargetLowering">
+This method must be implemented by targets.
+<CodeSnippet noContext id="the-lower-return"/>
+
+</Details>
+
+To begin, spin up the `NovaISelLowering.cpp` file.
+<CodeSnippet id="nova-isel-lowering-cpp-init"/>
+
+We have to declare legal types for the target. This is done in the `NovaTargetLowering` constructor.
+<CodeSnippet id="nova-isel-lowering-cpp-1"/>
+
+Now implement the `LowerReturn` method.
+<CodeSnippet id="nova-isel-lowering-ret-lower-1"/>
+
+<Details title="Classes used for lowering arguments and return values">
+These types that are used for calling-convention information.
+
+#### 1. `ISD::ArgFlagsTy`
+This is a bitset that contains information about the argument. It is used to
+   determine how the argument should be passed to the function.
+<Details title="ISD::ArgFlagsTy">
+<CodeSnippet noContext id="arg-flags"/>
+</Details>
+
+#### 2. `ISD::InputArg`
+This struct contains the flags and type information about a single incoming (formal) argument or incoming return value virtual register.
+
+<CodeSnippet noContext id="input-arg"/>
+
+#### 3. `ISD::OutputArg`
+Same as `ISD::InputArg`, but for outgoing arguments. It is used to determine how the argument should be passed to the function.
+<CodeSnippet noContext id="output-arg"/>
+</Details>
+
+
+The `Outs` vector contains the return values that we have to stuff into registers
+according to the calling convention.
+
+This is done by the generic return lowering code in `SelectionDAGBuilder.cpp`.
+It splits the return value of any LLVM type (like i17) into legal types (like i32, f32)
+and puts them into the `Outs` vector.
+
+Let's just support single register return values for now.
+<CodeSnippet id="nova-isel-lowering-ret-lower-2"/>
+
+<Details title="report_fatal_error" type="caution">
+We use this function here to report a *user* error.
+
+In the current LLVM version, the `report_fatal_error` function is
+deprecated and replaced by `reportFatalUsageError`.
+</Details>
+
+If we have no return values, just emit a return node.
+<CodeSnippet id="nova-isel-lowering-ret-lower-3"/>
+
+Else, we iterate over the values given in `Outs` and
+emit `CopyToReg` nodes for each value. These nodes must be glued together,
+and then to the final `NovaISD::Ret` node.
+
+> Note that this only supports `i32` values.
+
+<CodeSnippet id="nova-isel-lowering-ret-lower-4"/>
+
+Add dummy implementations for the `LowerCall` and other required methods.
+<CodeSnippet id="nova-isel-lowering-cpp-2"/>
+
+Finally, tell `CMakeLists.txt` to build the new file.
+<CodeSnippet id="cmake-isel-lowering"/>
+
+## Instruction Selection pass
+The lowering code above is driven by the instruction selection pass that comes after some
+IR optimizations in the `llc` pipeline.
+
+Let's create the pass for our target. The logic mainly comes from the `SelectionDAGISel` class.
+
+<CodeSnippet id="nova-isel-dag-to-dag.h"/>
+
+`Select()` is called for each node in the DAG. We can put our custom selection code and
+call the TableGen generated code to select the node based on patterns in td files.
+<CodeSnippet id="nova-isel-dag.cpp-1"/>
+
+Legacy passes like this one need to be initialized by registering them in the `PassRegistry`.
+We put such initializer functions in `Nova.h` file.
+<CodeSnippet id="nova-isel-dag-register-1"/>
+Finish with required includes.
+<CodeSnippet id="nova-isel-dag-register"/>
+
+## Plug into the pipeline
+We now set up the pass pipeline to use the new `NovaISelDAGToDAG` pass.
+Register the targetmachine in the target registry.
+<CodeSnippet id="initialize-nova-target"/>
+
+Targets construct their pipeline by using the `TargetPassConfig` class.
+<CodeSnippet id="nova-pass-config"/>
+
+---
+Great! We are almost there - the last piece of the backend is the instruction printer.
+
+## Instruction Printer
+To write the machine instructions to the assembly file, we have to implement
+our AsmPrinter pass. This uses another class called `MCInstPrinter` to print the
+instructions.
+
+This pass writes the `MachineInstr` to the output file. It is responsible for
+converting the `MachineInstr` to the target-specific assembly syntax.
+
+When we write the instructions in the `NovaInstrInfo.td` file, we also define the
+the assembly string format for it. TableGen will generate the printing method
+using that format.
+<CodeSnippet id="cmake-asm-writer"/>
+<CodeSnippet id="nova-inst-printer.h"/>
+The tablegen code is included in the implementation file like so:
+<CodeSnippet id="nova-inst-printer-1"/>
+
+To print instructions, we use the generated `printInstruction` method.
+Sometimes we need to print aliases of the instruction, which is handled by `printAliasInstr`.
+<CodeSnippet id="nova-inst-printer-2"/>
+
+Registers in MIPS assembly are printed as `$v0`, `$v1`, etc. This is done by the `printRegName` method.
+<CodeSnippet id="nova-inst-printer-3"/>
+
+Printing registers is just a special case of printing operands. `MCOperand` represents several types of operands:
+<CodeSnippet id="mc-operand"/>
+Handle this on a case-by-case basis in the `printOperand` method.
+<CodeSnippet id="nova-inst-printer-4"/>
+
+Let's get this show on the road by getting this in our target.
+<CodeSnippet id="nova-create-instprinter"/>
+Install the instance in the `Target` POD class.
+<CodeSnippet id="register-inst-printer"/>
+Reference the new header in.
+<CodeSnippet id="include-mc-instprinter"/>
+Get it rolling by garnishing `CMakeLists.txt` file with the new files.
+<CodeSnippet id="cmake-inst"/>
+
+### ASM Printer
+The class above is used by the assembly printer to print the instructions.
+<CodeSnippet id="nova-asm-printer.cpp"/>
+Add to cmake.
+<CodeSnippet id="cmake-asm-printer"/>
+
+
+## Compiling
+And we are done! We can compile this code to assembly now.
+
+```c title="test.ll"
+define void @main() {
+  ret void
+}
+```
+Run `llc` on the file.
+```bash withOutput title="llc"
+> llc -mtriple=mipsnova test.ll -o -
+        .text
+        .globl  voidTest                        # -- Begin function voidTest
+        .type   voidTest,@function
+voidTest:                               # @voidTest
+# %bb.0:
+        ret
+.Lfunc_end0:
+        .size   voidTest, .Lfunc_end0-voidTest
+                                        # -- End function
+        .section        ".note.GNU-stack","",@progbits
+```
+Congrats, you just completed your first LLVM backend!
+
+{/* <CodeSnippet id="nova-isel-lowering-1"/> */}
+
+{/* Add the instructions in the td file. */}
+
+{/* <CodeSnippet id="nova-instr-info-1"/> */}
+
+{/* <Details title="Glue and chains">
+<LinkCard
+   href="https://groups.google.com/g/llvm-dev/c/F-GU_LiLOLs/m/CVETl5FwCQAJ"
+   title="LLVM: Glue and chains"
+   />
+> Chains represent a dependency between nodes that can't be represented by a data dependency. For example a load following a store that might alias with the address of the load. The store must happen before the load. So the load's chain input is dependent on the store's chain output either directly or through other intermediate nodes that also have chain inputs and outputs. There can be multiple chains in parallel in the DAG. TokenFactor nodes are used to merge separate chains. The InstrEmitter ensures that the chain dependency is satisfied when emitting the linear instruction sequence after isel. But nothing guarantees that parallel chains won't be interleaved. After a node is schedule all of the nodes dependent on it either through data or chain are checked to see if they are now ready to schedule. The scheduler will pick from the ready to schedule nodes without any concern for whether they were on the same chain as the last node scheduled.
+>
+> Glue is stricter, it says that two nodes must be scheduled adjacent to each other in the linear instruction sequence.
+
+</Details> */}
+
+{/* We now have to tell LLVM how to lower return instructions. This is done in the `TargetLowering` class. */}
+
+{/* <Details title="See the virtual method in TargetLowering"> */}
+{/* This method must be implemented by targets. */}
+
+
+{/* <CodeSnippet noContext id="the-lower-return"/> */}
+
+{/* </Details> */}
+
+{/* But first, let's see how target calling conventions are defined. */}
+
+{/* The next major structure is the `SelectionDAG` that is passed to the `LowerReturn` method. Let's take a look at that. */}
+
+{/* ## `SelectionDAG`
+<Details title="Move this section" type="tip">
+This can be moved into its own page explaining the selection process.
+</Details>
+Each SDAG represents a single basic block in a function. In the instruction selection pipeline,
+the DAG is constructed from the LLVM IR. Then the DAG is transformed into a target-specific DAG.
+
+DAG is defined by the root and entry node.
+
+// write about printing and reading the dag. */}
+
+{/* ### Calling Conventions
+LLVM defines a number of common calling conventions, represented by the `CallingConv::ID` as an enum value.
+
+Some of them are `C`, `Fast`, `Cold` and some target-specific ones like `Win64` and `X86_64_SysV`. 
+
+**CCValAssign**
+This represents assignment of one arg/retval to a location.
+
+Let's now implement the `LowerReturn` method in our `TargetLowering` class.
+
+Setup the ISel Lowering file.
+<CodeSnippet id="nova-isel-lowering-1"/>
+Write the implementation.
+<CodeSnippet id="nova-isel-lowering-cpp-1"/>
+
+Now onto the LowerReturn method. */}
+{/* 
+Let's consider an example of a return statement that needs to be lowered.
+
+```c
+define i64 @rett(i32 %a, i32 %b) {
+entry:
+    %aext = zext i32 %a to i64
+    %bext = zext i32 %b to i64
+    %ret = add i64 %aext, %bext
+    ret i64 %ret
+}
+```
+This is converted into this selection DAG:
+```c {8,13}
+Initial selection DAG: %bb.0 'rett:entry'
+SelectionDAG has 17 nodes:
+  t0: ch,glue = EntryToken
+      t2: i32,ch = CopyFromReg t0, Register:i32 %0
+    t5: i64 = zero_extend t2
+      t4: i32,ch = CopyFromReg t0, Register:i32 %1
+    t6: i64 = zero_extend t4
+  t7: i64 = add t5, t6
+    t9: i32 = extract_element t7, Constant:i32<1>
+  t13: ch,glue = CopyToReg t0, Register:i32 $v0, t9
+    t11: i32 = extract_element t7, Constant:i32<0>
+  t15: ch,glue = CopyToReg t13, Register:i32 $v1, t11, t13:1
+  t16: ch = MipsISD::Ret t15, Register:i32 $v0, Register:i32 $v1, t15:1
+```
+We see that the return instruction returns two values for one i64 value. This is because the MIPS ABI requires that all values be returned in registers. The return value is split into two 32-bit values.
+
+The `LowerReturn` method is responsible for lowering the return instruction. It does this by iterating over the return values and creating a new `SDNode` for each value. The `SDNode` is then added to the DAG. */}
+
 {/* <CodeSnippet id="nova-isel-lowering-cpp-2"/> */}
 
-To get this method running, we need to implement the `NovaTargetMachine` and `NovaSubtarget` classes. These classes are responsible for providing information about the target architecture and the target machine.
+{/* To get this method running, we need to implement the `NovaTargetMachine` and `NovaSubtarget` classes. These classes are responsible for providing information about the target architecture and the target machine.
 
 ## Subtarget
-Some part of the subtarget class is generated by tablegen.
+Some part of the subtarget class is generated by tablegen. */}
 
 {/* <CodeSnippet id="nova-subtarget-1"/> */}

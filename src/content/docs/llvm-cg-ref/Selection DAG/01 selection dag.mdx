@@ -2,34 +2,9 @@
 title: Instruction selection with Selection DAG
 description: This describes the instruction selection process in the LLVM backend using Selection DAG.
 ---
-import CodeSnippet from "../../../components/CodeSnippet.astro";
-import Details from "../../../components/Collapsible.astro";
+import CodeSnippet from "../../../../components/CodeSnippet.astro";
+import Details from "../../../../components/Collapsible.astro";
 import { LinkCard, CardGrid, Aside } from "@astrojs/starlight/components";
-
-<Aside type="caution" title="Under construction">
-This page is under construction. This will contain information about the instruction selection process in LLVM.
-Details about how targets can configure the LLVM backend is on the next page.
-
-For now, read the following resources instead, then come back here to move on to the next page.
-
-<CardGrid>
-<LinkCard
-   href="https://llvm.org/docs/CodeGenerator.html#instruction-selection-section"
-   title="LLVM Instruction Selection docs"
-   target="_blank"
-/>
-<LinkCard
-   href="https://sourcecodeartisan.com/2020/11/17/llvm-backend-4.html"
-   title="Instruction Selection - Source Code Artisan"
-   target="_blank"
-/>
-{/* <LinkCard
-   href="https://eli.thegreenplace.net/2013/02/25/a-deeper-look-into-the-llvm-code-generator-part-1"
-   title="Eli Bendersky's blog post"
-   target="_blank"
-/> */}
-</CardGrid>
-</Aside>
 
 Once the frontend generates the LLVM IR, the compiler must convert it into machine instructions.
 
@@ -40,7 +15,7 @@ Nova can configure LLVM to generate machine instructions.
 Instruction selection is difficult because a processor provides different ways to perform the same operation.
 If we had exactly one way to perform a certain operation, the compiler would simply replace each IR line with the corresponding machine instruction.
 
-However, that is not the case. A simple reg to reg move instruction can be performed with addition, division, subtraction, multiplication, or a bitwise operation (with the other operand being the corresponding identity element).
+But rarely are things so simple. A simple reg to reg move instruction can be performed with addition, division, subtraction, multiplication, or a bitwise operation (with the other operand being the corresponding identity element).
 
 LLVM uses a tree pattern-matching structure called a Selection DAG to do this job.
 
@@ -88,7 +63,7 @@ false:
 ```
 </li>
 <li>
-import SelDagImage from "../../../assets/sel-dag-1.svg";
+import SelDagImage from "../../../../assets/sel-dag-1.svg";
 import { Image } from "astro:assets";
 
 This is now converted into a DAG like so:
@@ -104,7 +79,7 @@ Notice that there are two disconnected components in this DAG. The unconditional
 After constructing the DAG, we need to lower it to machine instructions.
 In this example, the brcond and setcc is combined into a single branch with compare instruction.
 
-import SelectedDAGImg from "../../../assets/sel-dag-2.svg";
+import SelectedDAGImg from "../../../../assets/sel-dag-2.svg";
 
 <Image quality="max" src={SelectedDAGImg} alt="Selection DAG" width="500"  loading="lazy" />
 </li>
@@ -130,6 +105,30 @@ chain. Further, if two nodes should be scheduled adjacent to each other, they us
    title="Taken from: Glue and chains"
 />
 
+<Aside type="caution" title="Under construction">
+This page is under construction. This will contain information about the instruction selection process in LLVM.
+Details about how targets can configure the LLVM backend is on the next page.
+
+For now, read the following resources instead, then come back here to move on to the next page.
+
+<CardGrid>
+<LinkCard
+   href="https://llvm.org/docs/CodeGenerator.html#instruction-selection-section"
+   title="LLVM Instruction Selection docs"
+   target="_blank"
+/>
+<LinkCard
+   href="https://sourcecodeartisan.com/2020/11/17/llvm-backend-4.html"
+   title="Instruction Selection - Source Code Artisan"
+   target="_blank"
+/>
+{/* <LinkCard
+   href="https://eli.thegreenplace.net/2013/02/25/a-deeper-look-into-the-llvm-code-generator-part-1"
+   title="Eli Bendersky's blog post"
+   target="_blank"
+/> */}
+</CardGrid>
+</Aside>
 #### Viewing the selection DAG output
 While compiling with `llc`, you can use these options to view the DAG output:
 

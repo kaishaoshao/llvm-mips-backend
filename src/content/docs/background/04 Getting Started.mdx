@@ -6,19 +6,40 @@ sidebar:
 ---
 import {Aside} from "@astrojs/starlight/components";
 
-<Aside title="Needs update" type="caution">
+{/* <Aside title="Needs update" type="caution">
 Needs instructions for building the LLVM and compiling programs with llc.
-</Aside>
+</Aside> */}
 
 ## Grab the LLVM source
-To do.
+Clone the official LLVM repository from GitHub.
+```bash
+git clone https://github.com/llvm/llvm-project.git
+```
+
 ### Build and install
-To do.
-Get the commit `7602d781b03427052c44537fa4b9c2a6da15697c`.
+Checkout the commit `7602d781b03427052c44537fa4b9c2a6da15697c`.
+You can create a new branch from here.
+```bash
+cd llvm-project
+git checkout 7602d781b03427052c44537fa4b9c2a6da15697c
+git switch -c your-branch-name
+```
 
+Build the LLVM project. See all options at [Building LLVM with CMake](https://llvm.org/docs/CMake.html#frequently-used-llvm-related-variables).
+Here is an example: (the `Nova` target is what we will add, so it won't work yet)
+> Nova can be enabled after the [Target Triple chapter](/section-1/01-triple).
+```bash
+cmake -S llvm -B build -G Ninja \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DLLVM_BUILD_TESTS=ON \
+      -DLLVM_PARALLEL_LINK_JOBS=8 \
+      -DLLVM_TARGETS_TO_BUILD='X86;Mips;Nova' # Nova won't work yet
 
-## The LLVM IR
-To do.
+cmake --build build --target llc
+```
 
-## Compiling with llc
-To do.
+{/* ## The LLVM IR */}
+{/* To do. */}
+
+{/* ## Compiling with llc */}
+{/* To do. */}

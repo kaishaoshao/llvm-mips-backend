@@ -52,7 +52,9 @@ def generate_lines(filename):
         for line in f:
             yield line
 
+
 IGNORE_FILES = ['.png']
+
 
 def get_abs_filenames(llvm_dir: Path):
     """
@@ -72,6 +74,8 @@ def get_abs_filenames(llvm_dir: Path):
 
 def get_reg_start(comment_chars: str):
     return r'^\s*' + comment_chars
+
+
 class Regexes:
     cpp_comments_filext = ['.cpp', '.h', '.td']
     hash_comments_filext = ['.txt']
@@ -80,9 +84,10 @@ class Regexes:
     start_suffix = r'@s\s+(?P<name>[^ \s]+)(?P<type>\s+[^\s=]+(=[^=\s]+)?)?\s*$'
     end_suffix = r'-\s+([^ ]+)\s*\n?$'
 
-    endings = ['{', '(', ',', ')'] # is for Triple::Triple(something) constructor syntax
-    keywords = ['if', 'while', 'switch']
-    
+    # is for Triple::Triple(something) constructor syntax
+    endings = ['{', '(', ',', ')']
+    keywords = ['for', 'if', 'while', 'switch']
+
     multiline_end = re.compile(r'^\s*[^)\n]+\)[^\n]*(;|(\{\}))?$')
 
     start_regex = re.compile(cpp_prefix + start_suffix)
@@ -117,6 +122,7 @@ def get_indent(line: str):
 
 class Context:
     ONLY_INCLUDE_FILES = ['.cpp', '.h']
+
     class Type(Enum):
         NONE = 20
         AFTER = 12  # this is for top level contexts outside namespaces
@@ -188,6 +194,7 @@ class Snippet:
             "type": self.type
         }
 
+
 class Statistics:
     def __init__(self):
         self.snippets = 0
@@ -198,12 +205,14 @@ class Statistics:
 
     def addFile(self):
         self.files += 1
-    
+
     def print(self):
         print(f"Statistics:")
         print(f"\t{self.snippets} snippets from {self.files} files.")
 
+
 STATS = Statistics()
+
 
 class FileSnippetReader:
     def __init__(self, filepath: Path, relative_filepath_str: str = None):
@@ -248,7 +257,7 @@ class FileSnippetReader:
             # print('where')
             return Context("", Context.Type.NONE, 0)
         return self.last_context.copyWith(Context.Type.AFTER)
-    
+
     def get_regex(self, start: bool):
         if self.filepath.suffix in Regexes.cpp_comments_filext:
             return Regexes.start_regex if start else Regexes.end_regex
@@ -258,7 +267,8 @@ class FileSnippetReader:
             return Regexes.ll_start_regex if start else Regexes.ll_end_regex
         else:
             # throw error
-            logger.fatal(Colors.error(f"Error: Unknown file extension {self.filepath.suffix}"))
+            logger.fatal(Colors.error(
+                f"Error: Unknown file extension {self.filepath.suffix}"))
             sys.exit(1)
 
     def extract_file_snippets(self, filepath: Path):
@@ -293,22 +303,32 @@ class FileSnippetReader:
                                          context_stack=the_context))
                 elif end_match:
                     if not stack:
-                        logger.error(f"{Colors.RED}Error: line {lineno}: Found end snippet without start")
+                        logger.error(
+                            f"{Colors.RED}Error: line {lineno}: Found end snippet without start")
                         logger.error(f"Snippet name: {end_match.group(1)}")
-                        logger.error(f"Snippet file: {self.filepath}{Colors.ENDC}")
+                        logger.error(
+                            f"Snippet file: {self.filepath}{Colors.ENDC}")
                         sys.exit(1)
                     end_line = lineno
                     top_snip = stack[-1]
                     if end_match.group(1).strip() != top_snip.name:
-                        logger.error(f"{Colors.RED}Error: line {lineno}: Found end snippet without start")
+                        logger.error(
+                            f"{Colors.RED}Error: line {lineno}: Found end snippet without start")
                         logger.error(f"Snippet name: '{end_match.group(1)}'")
-                        logger.error(f"Previous snippet name: '{top_snip.name}'")
-                        logger.error(f"Snippet file: {self.filepath}{Colors.ENDC}")
+                        logger.error(
+                            f"Previous snippet name: '{top_snip.name}'")
+                        logger.error(
+                            f"Snippet file: {self.filepath}{Colors.ENDC}")
                         sys.exit(1)
                     snippets.append(stack.pop().withEndLine(end_line))
 
                 # self.print_context()
-
+            if stack:
+                logger.error(
+                    f"{Colors.RED}Error: line {self.clineno()}: Found start snippet without end")
+                logger.error(f"Snippet name: '{stack[-1].name}'")
+                logger.error(f"Snippet file: {self.filepath}{Colors.ENDC}")
+                sys.exit(1)
             return snippets
 
     def print_context(self):
@@ -327,7 +347,7 @@ class FileSnippetReader:
             return False
         line = comments[0]
         return line.strip().startswith("}")
-    
+
     def ends_with_open_brace(self, line):
         line = line.strip()
         comments = line.split("//")
@@ -344,7 +364,8 @@ class FileSnippetReader:
         # context can be a function or enum or class
         # line = self.lines[self.i]
         class_regex = re.compile(r'^\s*(template<.+>)?\s?class')
-        class_forward = re.compile(r'^\s*(template<.+>\s?)?class\s+[\w_\d]+\s*;')
+        class_forward = re.compile(
+            r'^\s*(template<.+>\s?)?class\s+[\w_\d]+\s*;')
         struct_regex = re.compile(r'^\s*(template<.+>)?\s+struct')
         if not self.is_at_end():
             line = self.peek_line().strip()
@@ -382,7 +403,12 @@ class FileSnippetReader:
                     context_type = Context.Type.FUNCTION
                     # print("\t== found function at line", self.clineno(), self.filepath)
                 elif self.ends_with_open_brace(line):
-                    context_type = Context.Type.ANONYMOUS
+                    till_open_paren = line.find("(")
+                    if till_open_paren > 0:
+                        # print("Found open paren substr: ", line[:till_open_paren].strip() == "for")
+                        func_name = line[:till_open_paren].strip()
+                        if func_name not in Regexes.keywords:
+                            context_type = Context.Type.ANONYMOUS
             if context_type:
                 # print("found a context: ", line)
                 self.context_stack.append(
@@ -418,9 +444,7 @@ class FileSnippetReader:
                         #     print(
                         #         f"\t===popped for line:{self.clineno()}, {top.line}")
                     else:
-                        print(Colors.error(
-                            "Error: unmatched } at line "), self.clineno())
-                        print(f"File: {self.filepath}")
+                        logger.warning(f"Error: unmatched }} at line {self.clineno()}\nFile: {self.filepath}")
                         # sys.exit(1)
         if len(self.context_stack) > 0:
             self.last_context = self.context_stack[-1]
@@ -525,7 +549,10 @@ def main(llvm_dir_path: Path):
     # fileReader = FileSnippetReader(Path(llvm_dir_path))
     # print(fileReader.to_dict())
 
+
 START_TIME = 0
+
+
 def driver():
     global START_TIME
     START_TIME = time.time()
@@ -536,7 +563,7 @@ def driver():
     if args.verbose:
         level = logging.INFO
     else:
-        level = logging.ERROR
+        level = logging.CRITICAL
     if args.dump_contexts:
         level = logging.DEBUG
     logging.basicConfig(level=level)
@@ -546,6 +573,7 @@ def driver():
         return 0
 
     # logging.info(args)
+    global debug
     debug = args.dump_contexts
     all_snips = {}
     if args.input is not None:
@@ -560,7 +588,6 @@ def driver():
 
     writeOut(all_snips, args.output)
     return 0
-
 
 
 if __name__ == "__main__":
