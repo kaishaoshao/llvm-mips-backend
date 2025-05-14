@@ -92,6 +92,8 @@ needs two i32 registers, in `$v0` and `$v1`).
 This node will get selected to the `PseudoRet` instruction.
 <CodeSnippet id="nova-pseudo-ret"/>
 
+Add the pattern that will select the `NovaISD::Ret` node.
+<CodeSnippet id="nova-pseudo-ret-pat"/>
 
 All target tablegen files are included in the top-level `XXX.td` file.
 Include the new `NovaInstrInfo.td` file in `Nova.td`:

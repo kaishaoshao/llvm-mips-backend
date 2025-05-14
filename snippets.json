@@ -1168,10 +1168,23 @@
     "type": "end"
   },
   {
+    "id": "nova-pseudo-ret-pat",
+    "filename": "llvm/lib/Target/Nova/NovaInstrInfo.td",
+    "start_lineno": 19,
+    "end_lineno": 22,
+    "context_stack": [
+      {
+        "type": "NONE",
+        "line": 0
+      }
+    ],
+    "type": "end"
+  },
+  {
     "id": "nova-adj-stack-td",
     "filename": "llvm/lib/Target/Nova/NovaInstrInfo.td",
-    "start_lineno": 20,
-    "end_lineno": 38,
+    "start_lineno": 24,
+    "end_lineno": 42,
     "context_stack": [
       {
         "type": "NONE",

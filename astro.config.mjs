@@ -7,7 +7,7 @@ import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
-    site: "https://optimisan.github.io/",
+    site: "https://llvm-to-mips.netlify.app",
     integrations: [
         {
             name: "create-snippets-json",
