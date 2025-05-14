@@ -5,9 +5,14 @@ sidebar:
   order: 5
 ---
 
-There are few tutorials on writing LLVM backends, and the existing ones could get outdated quickly. This guide aims to provide a 
-comprehensive overview of how to write a backend for LLVM. I hope to explain some things that are not well documented, and to provide a
-good starting point for anyone interested in writing a backend.
+There are few tutorials on writing LLVM backends, and the existing ones could get outdated quickly.
+
+The main goal was to try to document how TableGen ISel patterns work and make it easier for newcomers to
+pick up without just relying on experimenting and looking at exampls from other backends.
+
+{/* This guide aims to provide a comprehensive overview of how to write a backend for LLVM. */}
+{/* I hope to explain some things that are not well documented, and to provide a */}
+{/* good starting point for anyone interested in writing a backend. */}
 
 With time I aim to add enough information to make this guide approachable to people not familiar with compilers or LLVM.
 
@@ -15,3 +20,11 @@ With time I aim to add enough information to make this guide approachable to peo
 > Copying existing patterns and reading the comments in Target.td and TargetSelectionDAG.td are the best ways I know of learning how this works. **I haven't seen a separate guide**, although it would be very cool if one existed.
 > -- [llvm-dev thread](https://groups.google.com/g/llvm-dev/c/aJCR1mBC0So/m/qQKo6tk6CAAJ)
 
+> Question: "How does one learn the details of TableGen's pattern-matching syntax?
+> I have tried to do this, maybe a dozen times and **failed every time**."
+> 
+> Answer: "...by trial and error"
+>
+> -- asked in https://www.youtube.com/watch?v=nNQ6AF6i5FI
+
+I hope it is no longer trial and error. Head on to the patterns section on the [tablegen for instruction selection page!](/llvm-cg-ref/selection-dag/02-selection-dag-td#patterns)

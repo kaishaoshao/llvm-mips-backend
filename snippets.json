@@ -560,7 +560,7 @@
     "id": "nova-inst-printer-2",
     "filename": "llvm/lib/Target/Nova/MCTargetDesc/NovaMCInstPrinter.cpp",
     "start_lineno": 13,
-    "end_lineno": 23,
+    "end_lineno": 22,
     "context_stack": [
       {
         "type": "NONE",
@@ -572,8 +572,8 @@
   {
     "id": "nova-inst-printer-3",
     "filename": "llvm/lib/Target/Nova/MCTargetDesc/NovaMCInstPrinter.cpp",
-    "start_lineno": 25,
-    "end_lineno": 29,
+    "start_lineno": 24,
+    "end_lineno": 28,
     "context_stack": [
       {
         "type": "NONE",
@@ -585,12 +585,12 @@
   {
     "id": "nova-inst-printer-4",
     "filename": "llvm/lib/Target/Nova/MCTargetDesc/NovaMCInstPrinter.cpp",
-    "start_lineno": 31,
-    "end_lineno": 48,
+    "start_lineno": 30,
+    "end_lineno": 47,
     "context_stack": [
       {
         "type": "AFTER",
-        "line": 26
+        "line": 25
       }
     ],
     "type": "add"

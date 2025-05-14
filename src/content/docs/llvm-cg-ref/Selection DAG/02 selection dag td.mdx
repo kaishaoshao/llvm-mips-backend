@@ -191,6 +191,8 @@ def RetRA : PseudoSE<(outs), (ins), [(MipsRet)]>;
 ## Patterns
 Patterns in TableGen are used to match the SDNodes to the instructions.
 
+> You can jump to the [Patterns Semantics section](#pattern-semantics) to just see the semantics.
+
 **Example**
 In this example, we match the `add` SDNode with the `ADDiu` instruction where
 one of the operands is a global address.
@@ -214,10 +216,36 @@ To match a SDAG pattern, we use the `Pat` class. The following defines a single 
 Signature:
 class Pattern<dag patternToMatch, list<dag> resultInstrs>;
 ```
-The `dag patternToMatch` is the SDNode that we want to match. This is also called as an
-*input pattern*.
+
+<Details title="Pat">
+Usually we use the `Pat` class instead of `Pattern` directly.
+Targets create their own `Pat` class wrapper.
+```jsx
+class MipsPat<dag pattern, dag result> : Pat<pattern, result>, PredicateControl;
+```
+</Details>
+**Input pattern**
+The LHS of the `Pat` is defined as the *input pattern*. (the `patternToMatch` in the above signature)
+The `dag patternToMatch` is the SDNode that we want to match in the SDAG.
+
+> Input patterns cannot contain instructions, so we cannot match instructions to
+.other instructions through these patterns.
+
+**Output pattern**
+The RHS is the *output pattern*.
+
 The `list<dag> resultInstrs` is the list of result SDAGs that we want to generate
-on matching the previous pattern. This is called as the *output pattern*.
+on matching the previous pattern. These cannot contain SDNodes (like `add`).
+
+
+```jsx title="Pat syntax"
+def : Pat<(input_pattern), (output_pattern)>;
+```
+
+
+The `list<dag> resultInstrs` is the list of result SDAGs that we want to generate
+on matching the previous pattern. This is called as the *output pattern*. These cannot 
+contain SDNodes (like `add`).
 
 <Aside type="danger" title="Multiple output patterns">
 Right now `resultInstrs` can only take a single dag in the list. This could change in the future (but is
@@ -229,78 +257,22 @@ class Pat<dag patternToMatch, dag resultInstrs> : Pattern<patternToMatch, [resul
 ```
 </Aside>
 
-> Patterns can also be defined *inline*, in the Instruction record.
+#### Inline patterns
+Patterns can also be defined *inline*, in the Instruction record.
+These are input patterns only (so we cannot use `OutPatFrags`).
 
-#### Pattern syntax
-I have attempted to condense the allowed syntax of patterns in this 
-BNF-like grammar. This is not exhaustive, but should be enough to serve as a
-quick reference.
+<LinkCard title="Read in detail how inline patterns work" href="https://llvm.org/docs/CodeGenerator.html"/>
 
-> On your first read, you can skip this block below and jump to the explanations ahead.
-
-```cpp
-using TGTypes = TableGenTypes; // only for readability,
-// this virtual namespace refers to types in the TableGen language.
-function recordOfType(TGTypes::Class className) -> TGTypes::Record;
-// this grammar function is to represent an instance record of a 
-// tablgen class.
-
-// values in single quotes are just characters or built-in records.
-
-pattern ::=  '(' PatternOperator ')' // only operator, no arguments
-           | '(' PatternOperator ArgList ')' // operator with arguments
-
-PatternOperator ::= 'null_frag'
-                    | TypeCastOperator
-                    | SDNodeOperator
-                    | recordOfType(
-                            PatFrags
-                            | Instruction // in output patterns only
-                            | SDNodeXForm // in output patterns only
-                            | Intrinsic // in input patterns only
-                            | ComplexPattern
-                          )
-                  | 'set' // can only be used in instruction inline patterns
-                  | 'ops' | 'ins' | 'outs' // only for pattern fragment operators 
-
-SDNodeOperator ::= OutputSDNodeOperator // for output patterns only
-                   | InputSDNodeOperator // for input patterns only
-
-OutputSDNodeOperator ::= 'imm' | 'timm' | 'fpimm' | 'tglobaltlsaddr'
-                    | 'tglobaladdr' | 'tblockaddress' | 'texternalsym'
-                    | 'tconstpool' | 'tjumptable' | 'tframeindex'
-                    | 'bb' | 'vt' | 'mcsym'
-                         // no other SDNodes' can be emitted in the DAG
-
-InputSDNodeOperator ::= recordOfType(SDNode) // like (add imm:$immediate, ...)
-                                            // any SDNode can be used here
-
-TypeCastOperator ::= TGTypes::List<recordOfType(ValueType)>
-                               // for intrinsics returning multiple values
-                               // like ([i16, i32] (intrinsic_with_two_ret_values ...))
-                    | recordOfType(ValueType) // single ret value type cast
-                                             // like (i16 (op_ret_one_val ...))
-
-ArgList ::= PatternArg ( ',' PatternArg )* // comma separated list of arguments
-
-PatternArg ::= PatternArgVal ArgName? // argument can have an optional name
-            | '$' name // no value
-            | 'node' ArgName // special record to indicate an input argument
-                             // for PatFrag operands only
-            | instanceOfType(TGTypes::Int) // int value, to match or emit constants
-            | instanceOfType(TGTypes::Bit) // converted to an int value
-            | instanceOfType(TGTypes::Bits) ArgName?
-                                      // Bits is also converted to an int value
-                                      // and emitted as TargetConstant node.
-
-ArgName ::= ':' '$' identifier
-
-PatternArgVal ::= pattern // note: (add imm:$imm) is the same as (add (imm):$imm)
-                | '?' // unset value
-                | SDNodeOperator // like 'imm' in (add imm:$immediate, ...)
-                                // this is wrapped into its own dag: imm:$name -> (imm):$name
-                | recordOfType(PatFrags) // this is wrapped similarly
+```jsx title="Inline pattern example"
+def ADD32 : XXXInstrFormat<(outs GPR32:$dst),
+                           (ins GPR32:$src1, GPR32:$src2),
+        /*inline pattern*/ (set GPR32:$dst, (add GPR32:$src1, GPR32:$src2))
+                           >;
 ```
+The special record `set` is used to match the output operand of the instruction.
+<Aside type="caution" title="set operator">
+`set` is only used in inline patterns like the above. It is not a generic pattern operator.
+</Aside>
 
 ### Using patterns
 
@@ -367,13 +339,34 @@ def : Pat<(multiple_pat_frag i16:$in), (NotInstr i16:$in)>;
 // target-specific DAG.
 ```
 
-<Details type="warning" title="Todo">
+### OutPatFrags
+The `PatFrags` we saw stand for input pattern macros. For output patterns,
+we need to use `OutPatFrags`.
+
+The syntax is the same as `PatFrags`, but we cannot use `SDNodeXForm` or `SDNode` records
+as operands.
+
+```jsx title="OutPatFrag example"
+def out_pat_frag : OutPatFrag<(ops node:$src1, node:$src2),
+                          (ADD32 $src1,
+                                 (ADD32 GPR32, $src2)
+                          )
+                          >;
+```
+
+These can be used in other pattern fragments also.
+```jsx title="Using out_pat_frag" "out_pat_frag"
+def : Pat<(fmul f32:$src1, f32:$src2),
+                (out_pat_frag $src1, $src2)>;
+```
+
+{/* <Details type="warning" title="Todo">
 - OutPatFrags is a type of `PatFrags` that can be used in output patterns.
 - "set" is a special operator that can be used in instruction's inline patterns
   - This is to match the return values to the instruction's OutOperands.
   - The corresponding explicit pattern should only match the SDNode with the instruction.
    (don't use the `set` operator)
-</Details>
+</Details> */}
 
 ### ComplexPatterns
 Complex patterns are used mainly for addressing modes where we want a C++ function to
@@ -452,3 +445,77 @@ def : Pat<(add GPR32:$src1, i32:$src2),
 ```
 GPR32 must contain `i32` though, else it is an error.
 </Aside>
+
+
+### Pattern semantics
+I have attempted to condense the allowed combinations of operations in patterns with this 
+BNF-like grammar syntax. This is not exhaustive, but should be enough to serve as a
+quick reference.
+
+```cpp
+using TGTypes = TableGenTypes; // only for readability,
+// this virtual namespace refers to types in the TableGen language.
+function recordOfType(TGTypes::Class className) -> TGTypes::Record;
+// this grammar function is to represent an instance record of a 
+// tablgen class.
+
+// values in single quotes are just characters or built-in records.
+
+pattern ::=  '(' PatternOperator ')' // only operator, no arguments
+           | '(' PatternOperator ArgList ')' // operator with arguments
+
+attribute bool pattern.isInput; // these match the SDAG nodes
+attribute bool pattern.isOutput; // these are what replace SDAG nodes.
+
+PatternOperator ::= 'null_frag'
+                    | TypeCastOperator
+                    | SDNodeOperator
+                    | recordOfType(
+                            PatFrags
+                            | Instruction if pattern.isOutput
+                            | SDNodeXForm if pattern.isOutput
+                            | Intrinsic if pattern.isInput
+                            | ComplexPattern
+                          )
+                  | 'set' // can only be used in instruction inline patterns
+                  | 'ops' | 'ins' | 'outs' // only for pattern fragment operators 
+
+SDNodeOperator ::= OutputSDNodeOperator if pattern.isOutput
+                   | InputSDNodeOperator if pattern.isInput
+
+OutputSDNodeOperator ::= 'imm' | 'timm' | 'fpimm' | 'tglobaltlsaddr'
+                    | 'tglobaladdr' | 'tblockaddress' | 'texternalsym'
+                    | 'tconstpool' | 'tjumptable' | 'tframeindex'
+                    | 'bb' | 'vt' | 'mcsym'
+                         // no other SDNodes' can be emitted in the DAG
+
+InputSDNodeOperator ::= recordOfType(SDNode) // like (add imm:$immediate, ...)
+                                            // any SDNode can be used here
+
+TypeCastOperator ::= TGTypes::List<recordOfType(ValueType)>
+                               // for intrinsics returning multiple values
+                               // like ([i16, i32] (intrinsic_with_two_ret_values ...))
+                    | recordOfType(ValueType) // single ret value type cast
+                                             // like (i16 (op_ret_one_val ...))
+
+ArgList ::= PatternArg ( ',' PatternArg )* // comma separated list of arguments
+
+PatternArg ::= PatternArgVal ArgName? // argument can have an optional name
+            | '$' name // no value
+            | 'node' ArgName // special record to indicate an input argument
+                             // for PatFrag operands only
+            | instanceOfType(TGTypes::Int) // int value, to match or emit constants
+            | instanceOfType(TGTypes::Bit) // converted to an int value
+            | instanceOfType(TGTypes::Bits) ArgName?
+                                      // Bits is also converted to an int value
+                                      // and emitted as TargetConstant node.
+
+ArgName ::= ':' '$' identifier
+
+PatternArgVal ::= pattern // note: (add imm:$imm) is the same as (add (imm):$imm)
+                | '?' // unset value
+                | SDNodeOperator // like 'imm' in (add imm:$immediate, ...)
+                                // this is wrapped into its own dag: imm:$name -> (imm):$name
+                | recordOfType(PatFrags) // this is wrapped similarly
+```
+
