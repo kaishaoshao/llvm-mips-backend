@@ -261,7 +261,7 @@ class Pat<dag patternToMatch, dag resultInstrs> : Pattern<patternToMatch, [resul
 Patterns can also be defined *inline*, in the Instruction record.
 These are input patterns only (so we cannot use `OutPatFrags`).
 
-<LinkCard title="Read in detail how inline patterns work" href="https://llvm.org/docs/CodeGenerator.html"/>
+<LinkCard title="Read in detail how inline patterns work" href="https://llvm.org/docs/WritingAnLLVMBackend.html#instruction-set"/>
 
 ```jsx title="Inline pattern example"
 def ADD32 : XXXInstrFormat<(outs GPR32:$dst),

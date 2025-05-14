@@ -22,20 +22,24 @@ import BlurCard from "../../components/BlurCard.astro";
 <div className="page-gradient"></div>
 <div className="content-wrapper">
 <CardGrid stagger>
-  <BlurCard title="LLVM Basics" icon="seti:code-climate">
-    Learn the fundamental concepts of LLVM backends, including TableGen, target description files, and the overall architecture of LLVM's code generation infrastructure.
+  <BlurCard title="Build your first backend" icon="pencil">
+    Build your first LLVM backend in a weekend! Find every step lucidly explained in the pages that follow.
   </BlurCard>
 
+  {/* <BlurCard title="LLVM Basics" icon="seti:code-climate">
+    Learn the fundamental concepts of LLVM backends, including TableGen, target description files, and the overall architecture of LLVM's code generation infrastructure.
+  </BlurCard> */}
+
 {" "}
+  <BlurCard title="TableGen patterns" icon="seti:prisma">
+    Understand how to define patterns in TableGen for instruction selection without guesswork or
+    having to read the source code (although you probably should, lest I've missed something).
+  </BlurCard>
 
-<BlurCard title="MIPS Architecture" icon="seti:asm">
+{/* <BlurCard title="MIPS Architecture" icon="seti:asm"> */}
   {/* ### 2. MIPS Architecture Deep Dive Explore the MIPS instruction set */}
-  Learn the MIPS architecture, including its instruction set and calling conventions.
-</BlurCard>
-
-<BlurCard title="Build your first backend" icon="seti:code-climate">
-  Build your first LLVM backend in a weekend! Find every step lucidly explained in the pages that follow.
-</BlurCard>
+  {/* Learn the MIPS architecture, including its instruction set and calling conventions. */}
+{/* </BlurCard> */}
 
 {/* <BlurCard title=""> */}
 {/* <Card>

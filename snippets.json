@@ -624,8 +624,8 @@
   {
     "id": "include-mcsubtarget-info",
     "filename": "llvm/lib/Target/Nova/MCTargetDesc/NovaMCTargetDesc.cpp",
-    "start_lineno": 28,
-    "end_lineno": 30,
+    "start_lineno": 29,
+    "end_lineno": 31,
     "context_stack": [
       {
         "type": "NONE",
@@ -637,8 +637,8 @@
   {
     "id": "include-mc-instrinfo",
     "filename": "llvm/lib/Target/Nova/MCTargetDesc/NovaMCTargetDesc.cpp",
-    "start_lineno": 31,
-    "end_lineno": 33,
+    "start_lineno": 32,
+    "end_lineno": 34,
     "context_stack": [
       {
         "type": "NONE",
@@ -650,8 +650,8 @@
   {
     "id": "include-mc-asm-info",
     "filename": "llvm/lib/Target/Nova/MCTargetDesc/NovaMCTargetDesc.cpp",
-    "start_lineno": 34,
-    "end_lineno": 37,
+    "start_lineno": 35,
+    "end_lineno": 38,
     "context_stack": [
       {
         "type": "NONE",
@@ -663,8 +663,8 @@
   {
     "id": "include-mc-instprinter",
     "filename": "llvm/lib/Target/Nova/MCTargetDesc/NovaMCTargetDesc.cpp",
-    "start_lineno": 38,
-    "end_lineno": 40,
+    "start_lineno": 39,
+    "end_lineno": 41,
     "context_stack": [
       {
         "type": "NONE",
@@ -676,8 +676,8 @@
   {
     "id": "nova-get-instrinfo",
     "filename": "llvm/lib/Target/Nova/MCTargetDesc/NovaMCTargetDesc.cpp",
-    "start_lineno": 47,
-    "end_lineno": 51,
+    "start_lineno": 48,
+    "end_lineno": 52,
     "context_stack": [
       {
         "type": "NONE",
@@ -689,8 +689,8 @@
   {
     "id": "nova-get-subtargetinfo",
     "filename": "llvm/lib/Target/Nova/MCTargetDesc/NovaMCTargetDesc.cpp",
-    "start_lineno": 57,
-    "end_lineno": 60,
+    "start_lineno": 58,
+    "end_lineno": 61,
     "context_stack": [
       {
         "type": "NONE",
@@ -702,12 +702,12 @@
   {
     "id": "nova-create-subtarget",
     "filename": "llvm/lib/Target/Nova/MCTargetDesc/NovaMCTargetDesc.cpp",
-    "start_lineno": 68,
-    "end_lineno": 74,
+    "start_lineno": 69,
+    "end_lineno": 75,
     "context_stack": [
       {
         "type": "AFTER",
-        "line": 62
+        "line": 63
       }
     ],
     "type": "end"
@@ -715,12 +715,12 @@
   {
     "id": "nova-create-asm-info",
     "filename": "llvm/lib/Target/Nova/MCTargetDesc/NovaMCTargetDesc.cpp",
-    "start_lineno": 76,
-    "end_lineno": 84,
+    "start_lineno": 77,
+    "end_lineno": 85,
     "context_stack": [
       {
         "type": "AFTER",
-        "line": 69
+        "line": 70
       }
     ],
     "type": "end"
@@ -728,12 +728,12 @@
   {
     "id": "register-instrinfo",
     "filename": "llvm/lib/Target/Nova/MCTargetDesc/NovaMCTargetDesc.cpp",
-    "start_lineno": 86,
-    "end_lineno": 92,
+    "start_lineno": 87,
+    "end_lineno": 93,
     "context_stack": [
       {
         "type": "AFTER",
-        "line": 77
+        "line": 78
       }
     ],
     "type": "add"
@@ -741,12 +741,12 @@
   {
     "id": "nova-create-instprinter",
     "filename": "llvm/lib/Target/Nova/MCTargetDesc/NovaMCTargetDesc.cpp",
-    "start_lineno": 94,
-    "end_lineno": 98,
+    "start_lineno": 95,
+    "end_lineno": 99,
     "context_stack": [
       {
         "type": "AFTER",
-        "line": 87
+        "line": 88
       }
     ],
     "type": "add"
@@ -754,12 +754,12 @@
   {
     "id": "nova-register-subtarget",
     "filename": "llvm/lib/Target/Nova/MCTargetDesc/NovaMCTargetDesc.cpp",
-    "start_lineno": 103,
-    "end_lineno": 105,
+    "start_lineno": 104,
+    "end_lineno": 106,
     "context_stack": [
       {
         "type": "FUNCTION",
-        "line": 100
+        "line": 101
       }
     ],
     "type": "end"
@@ -767,12 +767,12 @@
   {
     "id": "register-instrinfo-2",
     "filename": "llvm/lib/Target/Nova/MCTargetDesc/NovaMCTargetDesc.cpp",
-    "start_lineno": 106,
-    "end_lineno": 108,
+    "start_lineno": 107,
+    "end_lineno": 109,
     "context_stack": [
       {
         "type": "FUNCTION",
-        "line": 100
+        "line": 101
       }
     ],
     "type": "end"
@@ -780,12 +780,12 @@
   {
     "id": "register-asm-info",
     "filename": "llvm/lib/Target/Nova/MCTargetDesc/NovaMCTargetDesc.cpp",
-    "start_lineno": 109,
-    "end_lineno": 111,
+    "start_lineno": 110,
+    "end_lineno": 112,
     "context_stack": [
       {
         "type": "FUNCTION",
-        "line": 100
+        "line": 101
       }
     ],
     "type": "end"
@@ -793,12 +793,12 @@
   {
     "id": "register-inst-printer",
     "filename": "llvm/lib/Target/Nova/MCTargetDesc/NovaMCTargetDesc.cpp",
-    "start_lineno": 112,
-    "end_lineno": 114,
+    "start_lineno": 113,
+    "end_lineno": 115,
     "context_stack": [
       {
         "type": "FUNCTION",
-        "line": 100
+        "line": 101
       }
     ],
     "type": "add"
@@ -819,8 +819,8 @@
   {
     "id": "nova-get-subtargetinfo-h",
     "filename": "llvm/lib/Target/Nova/MCTargetDesc/NovaMCTargetDesc.h",
-    "start_lineno": 25,
-    "end_lineno": 28,
+    "start_lineno": 26,
+    "end_lineno": 29,
     "context_stack": [
       {
         "type": "NONE",
@@ -832,8 +832,8 @@
   {
     "id": "nova-get-instrinfo-h",
     "filename": "llvm/lib/Target/Nova/MCTargetDesc/NovaMCTargetDesc.h",
-    "start_lineno": 30,
-    "end_lineno": 33,
+    "start_lineno": 31,
+    "end_lineno": 34,
     "context_stack": [
       {
         "type": "NONE",
@@ -846,7 +846,7 @@
     "id": "nova-h-old",
     "filename": "llvm/lib/Target/Nova/Nova.h",
     "start_lineno": 1,
-    "end_lineno": 9,
+    "end_lineno": 8,
     "context_stack": [
       {
         "type": "NONE",
@@ -897,8 +897,8 @@
   {
     "id": "nova-instr-info-td-include",
     "filename": "llvm/lib/Target/Nova/Nova.td",
-    "start_lineno": 18,
-    "end_lineno": 20,
+    "start_lineno": 19,
+    "end_lineno": 21,
     "context_stack": [
       {
         "type": "NONE",
@@ -1421,8 +1421,8 @@
   {
     "id": "deleted-mc-init",
     "filename": "llvm/lib/Target/Nova/NovaTargetMachine.cpp",
-    "start_lineno": 27,
-    "end_lineno": 31,
+    "start_lineno": 28,
+    "end_lineno": 32,
     "context_stack": [
       {
         "type": "NONE",
@@ -1434,8 +1434,8 @@
   {
     "id": "old-get-the-nova",
     "filename": "llvm/lib/Target/Nova/NovaTargetMachine.cpp",
-    "start_lineno": 33,
-    "end_lineno": 35,
+    "start_lineno": 34,
+    "end_lineno": 36,
     "context_stack": [
       {
         "type": "NONE",
@@ -1447,8 +1447,8 @@
   {
     "id": "old-initialize-nova-target",
     "filename": "llvm/lib/Target/Nova/NovaTargetMachine.cpp",
-    "start_lineno": 37,
-    "end_lineno": 39,
+    "start_lineno": 38,
+    "end_lineno": 40,
     "context_stack": [
       {
         "type": "NONE",
@@ -1460,8 +1460,8 @@
   {
     "id": "nova-target-info-tm",
     "filename": "llvm/lib/Target/Nova/NovaTargetMachine.cpp",
-    "start_lineno": 41,
-    "end_lineno": 44,
+    "start_lineno": 42,
+    "end_lineno": 45,
     "context_stack": [
       {
         "type": "NONE",
@@ -1473,8 +1473,8 @@
   {
     "id": "include-tm",
     "filename": "llvm/lib/Target/Nova/NovaTargetMachine.cpp",
-    "start_lineno": 49,
-    "end_lineno": 52,
+    "start_lineno": 50,
+    "end_lineno": 53,
     "context_stack": [
       {
         "type": "NONE",
@@ -1486,8 +1486,8 @@
   {
     "id": "new-get-the-nova",
     "filename": "llvm/lib/Target/Nova/NovaTargetMachine.cpp",
-    "start_lineno": 56,
-    "end_lineno": 58,
+    "start_lineno": 57,
+    "end_lineno": 59,
     "context_stack": [
       {
         "type": "NONE",
@@ -1499,12 +1499,12 @@
   {
     "id": "initialize-nova-target",
     "filename": "llvm/lib/Target/Nova/NovaTargetMachine.cpp",
-    "start_lineno": 69,
-    "end_lineno": 73,
+    "start_lineno": 70,
+    "end_lineno": 74,
     "context_stack": [
       {
         "type": "FUNCTION",
-        "line": 68
+        "line": 69
       }
     ],
     "type": "replace=old-initialize-nova-target"
@@ -1512,12 +1512,12 @@
   {
     "id": "nova-pass-config",
     "filename": "llvm/lib/Target/Nova/NovaTargetMachine.cpp",
-    "start_lineno": 76,
-    "end_lineno": 97,
+    "start_lineno": 77,
+    "end_lineno": 98,
     "context_stack": [
       {
         "type": "AFTER",
-        "line": 68
+        "line": 69
       }
     ],
     "type": "add"
