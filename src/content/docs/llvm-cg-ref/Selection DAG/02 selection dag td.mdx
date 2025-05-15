@@ -191,11 +191,9 @@ def RetRA : PseudoSE<(outs), (ins), [(MipsRet)]>;
 ## Patterns
 Patterns in TableGen are used to match the SDNodes to the instructions.
 
-> You can jump to the [Patterns Semantics section](#pattern-semantics) to just see the semantics.
+> You can jump to the [Patterns Semantics section](#pattern-semantics-reference) to just see the semantics.
 
-**Example**
-In this example, we match the `add` SDNode with the `ADDiu` instruction where
-one of the operands is a global address.
+Before we get into the details, here is a simple example of a pattern:
 
 ```php title="XXXInstrInfo.td"
 def : Pat<(add GPR32:$gp, (MipsGPRel tglobaladdr:$in)),
@@ -207,6 +205,8 @@ def : Pat<(add GPR32:$gp, (MipsGPRel tglobaladdr:$in)),
 // tglobaladdr = builtin SDNode for a global address
 // ADDiu = The target's instruction for the add immediate unsigned operation
 ```
+We match the `add` SDNode with the `ADDiu` instruction where
+one of the operands is a global address.
 
 
 ### Syntax
@@ -347,10 +347,16 @@ The syntax is the same as `PatFrags`, but we cannot use `SDNodeXForm` or `SDNode
 as operands.
 
 ```jsx title="OutPatFrag example"
-def out_pat_frag : OutPatFrag<(ops node:$src1, node:$src2),
-                          (ADD32 $src1,
+def out_pat_frag : OutPatFrag<
+                          (ops node:$src1, node:$src2),
+                          (ADD32 $src1, // ADD32 is an instruction
                                  (ADD32 GPR32, $src2)
                           )
+                          >;
+// We cannot use SDNodes like `add` or `xor` in the output pattern.
+def invalid_pat_frag : OutPatFrag< // use PatFrag instead
+                          (ops node:$src1, node:$src2),
+                          (add $src1, $src2) // invalid
                           >;
 ```
 
@@ -444,10 +450,19 @@ def : Pat<(add GPR32:$src1, i32:$src2),
                 (ADDrr GPR32:$src1, GPR32:$src2)>;
 ```
 GPR32 must contain `i32` though, else it is an error.
+
+Trying this in `PatFrag`s seems to fail, so I am not sure if this is
+a universal rule. No one really does this sort of partly-constrained
+matching; it is the return type that is casted like shown above.
+
+```jsx title="Return type cast" "i32"
+def : Pat<(brcond (i32 (cond_op RO:$rs, RO:$rt)), bb:$offset),
+          (CBranch RO:$rs, RO:$rt, bb:$offset)>;
+```
 </Aside>
 
 
-### Pattern semantics
+### Pattern semantics reference
 I have attempted to condense the allowed combinations of operations in patterns with this 
 BNF-like grammar syntax. This is not exhaustive, but should be enough to serve as a
 quick reference.
