@@ -26,7 +26,7 @@ website content without changing the code for the Nova backend.
 ```bash
 cd llvm-mips-tutorial # or whatever you name this
                       # book-tutorial-project's directory
-git clone --single-branch --branch mipsnova-backend https://github.com/optimisan/llvm-project.git
+git clone --single-branch --branch nova-backend https://github.com/optimisan/llvm-project.git
 ```
 
 2. Clone this repository.
