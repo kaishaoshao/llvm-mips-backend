@@ -6,13 +6,18 @@ sidebar:
 ---
 This tutorial will go over the process of converting LLVM IR to MIPS assembly code.
 
+> Right now this only covers the return instruction.
+
 Specifically, we will only be working on `llc`, the static LLVM IR to assembly compiler.
 
 import {LinkCard} from "@astrojs/starlight/components";
 
 <LinkCard title="Read more about llc" href="https://llvm.org/docs/CommandGuide/llc.html" />
 
-We will add a new target named Nova to the LLVM tree for the MIPS architecture. Like [Crafting Interpreters](https://craftinginterpreters.com), every line has an explanation in this series so you can follow along without needing to scour the internet for answers.
+We will add a new target named Nova to the LLVM tree for the MIPS architecture. Like [Crafting Interpreters](https://craftinginterpreters.com), every line has an explanation in this series so you can follow along seamlessly.
+
+> The main contribution of this tutorial is the pattern matching syntax for tablegen, [given here](/llvm-cg-ref/selection-dag/02-selection-dag-td/)
+
 
 ## Reader's guide
 
@@ -45,7 +50,7 @@ Hello World!
 Output is after this code block
 ```
 
-## Code Snippets
+{/* ## Code Snippets
 Code snippets are displayed in diff style shown below. Sometimes some sections are collapsed
 and can be expanded by clicking on the `X collapsed lines` indicator.
 
@@ -55,7 +60,7 @@ the context below implies that a new file should be created for this snippet.
 
 import CodeSnippet from "../../../components/CodeSnippet.astro";
 
-<CodeSnippet id="nova-tm-cpp" collapse={["2-3", "8-9", "13-14"]}/>
+<CodeSnippet id="nova-tm-cpp" collapse={["2-3", "8-9", "13-14"]}/> */}
 
 ## Errata
 If you find any errors or have any suggestions, please let me know by creating an issue on the book's GitHub repository. PRs are also most welcome!
