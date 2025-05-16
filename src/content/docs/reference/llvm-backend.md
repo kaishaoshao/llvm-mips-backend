@@ -3,20 +3,28 @@ title: LLVM backend resources
 description: Talks, blogs, slides on LLVM backend structures.
 ---
 
+## Backend
+### From LLVM
 Official LLVM backend guide: https://llvm.org/docs/WritingAnLLVMBackend.html
 
-
+### Talks and slides
 Slides on Selection DAG: https://llvm.org/devmtg/2024-10/slides/tutorial/MacLean-Fargnoli-ABeginnersGuide-to-SelectionDAG.pdf
 
 Slides on building an LLVM Backend, has all the basics.
 https://llvm.org/devmtg/2014-04/PDFs/Talks/Building%20an%20LLVM%20backend.pdf
 
+Dealing with register hierarchies https://llvm.org/devmtg/2016-11/Slides/Braun-DealingWithRegisterHierarchies.pdf
+
+### Articles and blogs
 A guide just like this one.
 https://sourcecodeartisan.com/2020/09/13/llvm-backend-0.html
 
 Detailed guide https://jonathan2251.github.io/lbd/TutorialLLVMBackendCpu0.pdf
 The ebook version: https://jonathan2251.github.io/lbt/index.html
 
+A great overview of SelectionDAG https://eli.thegreenplace.net/2013/02/25/a-deeper-look-into-the-llvm-code-generator-part-1
+
+### Others
 **From [this llvm thread](https://groups.google.com/g/llvm-dev/c/aJCR1mBC0So/m/yZipPTzTCAAJ)**
 > "Lessons in TableGen"
 > FOSDEM 2019; Nicolai Hähnle
@@ -59,6 +67,3 @@ The ebook version: https://jonathan2251.github.io/lbt/index.html
 > LEG Example Backend: a simple example LLVM backend for an ARM-like
 > architecture: 'LEG'.
 > https://github.com/frasercrmck/llvm-leg
-
-## Others
-Dealing with register hierarchies https://llvm.org/devmtg/2016-11/Slides/Braun-DealingWithRegisterHierarchies.pdf
