@@ -8,19 +8,18 @@ sidebar:
 import {Aside} from "@astrojs/starlight/components";
 import CodeSnippet from "../../../components/CodeSnippet.astro";
 
-
-{/* <Aside title="Incomplete" type="caution">
-This section is incomplete and is in the works. It should only contain the minimum
-necessary code to be able to build LLVM for the Nova target.
-See [this commit](https://reviews.llvm.org/D88389) for reference.
-</Aside> */}
-
 Before we can start adding instructions, we need to set up some required configuration code.
 This contains the Nova subtarget, register and instruction information, frame and selection DAG
 lowering classes and a few others that set up the code generation pipeline.
 
 The code we add here will allow us to build LLVM for the Nova target but not to compile
 any LLVM IR to assembly code yet.
+
+<Aside title="LLVM reference">
+This chapter does a part of the work needed for an introductory commit for a new backend.
+For an example, see [this commit](https://reviews.llvm.org/D88389) which
+introduced the M68k target.
+</Aside>
 
 ## Adding the NovaSubtarget
 TableGen generates the `NovaGenSubtarget` class. Add the tablegen invocation to
@@ -119,3 +118,4 @@ Place it into the Target.
 Lastly, don't forget to add the source files to CMakeLists.txt.
 <CodeSnippet id="cmake-setting-up"/>
 With this, we are set to implement instructions.
+

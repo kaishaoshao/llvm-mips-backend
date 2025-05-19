@@ -13,6 +13,8 @@ Slides on Selection DAG: https://llvm.org/devmtg/2024-10/slides/tutorial/MacLean
 Slides on building an LLVM Backend, has all the basics.
 https://llvm.org/devmtg/2014-04/PDFs/Talks/Building%20an%20LLVM%20backend.pdf
 
+TableGen [slide on fosdem.org](https://archive.fosdem.org/2019/schedule/event/llvm_tablegen/attachments/slides/3304/export/events/attachments/llvm_tablegen/slides/3304/tablegen.pdf)
+
 Dealing with register hierarchies https://llvm.org/devmtg/2016-11/Slides/Braun-DealingWithRegisterHierarchies.pdf
 
 ### Articles and blogs
@@ -24,7 +26,16 @@ The ebook version: https://jonathan2251.github.io/lbt/index.html
 
 A great overview of SelectionDAG https://eli.thegreenplace.net/2013/02/25/a-deeper-look-into-the-llvm-code-generator-part-1
 
-### Others
+### Commits
+Parameterized register class information https://reviews.llvm.org/D31951?id=113075
+
+### Mailing List
+Simpler types in TableGen isel patterns https://groups.google.com/g/llvm-dev/c/RsiiCoV4U3Q/m/wVgeXn31CIQJ
+
+Debugging vector instruction operands https://lists.llvm.org/pipermail/llvm-dev/2016-December/107784.html
+
+SelectionDAG and GlobalISel discussion https://groups.google.com/g/llvm-dev/c/lAp7QFJfltY
+
 **From [this llvm thread](https://groups.google.com/g/llvm-dev/c/aJCR1mBC0So/m/yZipPTzTCAAJ)**
 > "Lessons in TableGen"
 > FOSDEM 2019; Nicolai Hähnle
@@ -67,3 +78,8 @@ A great overview of SelectionDAG https://eli.thegreenplace.net/2013/02/25/a-deep
 > LEG Example Backend: a simple example LLVM backend for an ARM-like
 > architecture: 'LEG'.
 > https://github.com/frasercrmck/llvm-leg
+
+## Other stuff
+> May not be related to LLVM
+
+https://github.com/edrosten/autoconf_tutorial
